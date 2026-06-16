@@ -1,0 +1,15 @@
+Frontend/justfine/node_modules/
+Frontend/justfine/dist/
+Frontend/justfine/dist-ssr/
+Frontend/justfine/*.local
+Frontend/justfine/.env
+Frontend/justfine/.env.*
+Frontend/justfine/.vite/
+Frontend/justfine/.eslintcache
+Frontend/justfine/.turbo/
+
+.vscode/
+.idea/
+.DS_Store
+*.suo
+*.sw?
