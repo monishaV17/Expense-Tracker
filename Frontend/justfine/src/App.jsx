@@ -1,10 +1,15 @@
 import React from 'react';
+import {Routes, Route} from 'react-router-dom';
 import Auth from './components/Auth';
-import SideBar from './components/sidebar';
+import SideBar from './components/SideBar';
 
 function App(){
-    return <Auth/>
-    return <SideBar/>
+    return (
+        <Routes>
+            <Route path="/" element={<Auth />}/>
+            <Route path="/dashboard" element={<SideBar />}/>
+        </Routes>
+    );
 }
 
 export default App;
