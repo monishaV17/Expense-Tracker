@@ -23,11 +23,12 @@ function SideBar(){
     title: "CONFIGURE",
     items: [
       { id: "cats", label: "Categories", icon: "ti-category" },
-      { id: "notif", label: "Notifications", icon: "ti-bell", badge: 2 }
+      { id: "notif", label: "Notifications", icon: "ti-bell" }
         ]
     }
     ];
-const [activeItem,setActiveItem]=useState('dash');
+const [activeItem, setActiveItem]=useState('dash');
+const [headerLabel,setHeaderLabel]=useState('Dashboard');
 
     return(
         <aside className="sidebar">
@@ -48,14 +49,17 @@ const [activeItem,setActiveItem]=useState('dash');
             <nav className="nav-sidebar">
             {sidebarData.map((section)=>(
                 <div key={section.title} className="menu-section">
-                    <h3 className="section-title">{section.title}</h3>
+                    <span className="section-title">{section.title}</span>
                     <ul>
                         {section.items.map((item) => (
                         <li
                             key={item.id}
                             className={`nav-item 
                             ${activeItem === item.id ? 'active' : ''}`} 
-                            onClick={()=>setActiveItem(item.id)}>
+                            onClick={() => {
+                                setActiveItem(item.id),
+                                setHeaderLabel(item.label)
+                            }}>
                             <i className={`ti ${item.icon}`} />
                             <span className="label">{item.label}</span>
                             {item.badge && (<span className="nav-badge">{item.badge}</span>
@@ -68,10 +72,10 @@ const [activeItem,setActiveItem]=useState('dash');
             </nav>
 
             <div className="sidebar-user">
-                <div className="user-avatar">Moni</div>
+                <div className="user-avatar"></div>
                 <div className="user-info">
-                    <div className="user-name">john_doe</div>
-                    <div className="user-email">john@example.com</div>
+                    <div className="user-name">Moni</div>
+                    <div className="user-email">moni@example.com</div>
                 </div>
             </div>
         </aside>

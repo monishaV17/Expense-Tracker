@@ -48,7 +48,7 @@ function Auth(){
                         {!isLogin && (
                             <div className='input-group'>
                                 <label>Email</label>
-                                <input type='email' placeholder='Enter email' id='email' name='email' value={formData.email} onChange={handleChange}required/>
+                                <input type='email' placeholder='Enter email' id='email' name='email' value={formData.email} onChange={handleChange} required/>
                             </div>
                         )}
                         <div className='input-group'>
