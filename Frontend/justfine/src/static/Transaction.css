@@ -1,0 +1,19 @@
+:root{
+  --surface: #ffffff;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --blue: #2563eb;
+  --blue-light: #eff6ff;
+  --nav-hover: #f1f5f9;
+}
+
+body.dark{
+  --surface: #1e293b;
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --border: #334155;
+  --blue: #3b82f6;
+  --blue-light: #1e3a5f;
+  --nav-hover: #334155;
+}

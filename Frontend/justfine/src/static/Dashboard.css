@@ -52,6 +52,8 @@ body.dark{
     text-transform: uppercase;
     letter-spacing: 0.5px;
     display: block;
+    margin-top: 25px;
+    margin-bottom: 10px;
 }
 
 .dashboard-balance-amount{
@@ -67,12 +69,13 @@ body.dark{
     padding: 3px 10px;
     border-radius: 20px;
     opacity: 0.9;
+    margin-top: 5px;
 }
 
 .transaction-type{
     gap: 12px;
     display: flex;
-    margin-top: 20px;
+    margin-top: 30px;
 }
 
 .btn{
