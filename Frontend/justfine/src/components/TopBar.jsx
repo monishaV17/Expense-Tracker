@@ -17,11 +17,6 @@ const handleNotify=()=>{
             <h3>{headerLabel}</h3>
             <input className="search" type="text" placeholder="🔍 Search transactions..." value={search} onChange={(e)=> setSearch(e.target.value)}/>
             <ToggleTheme /> 
-            <div className="notification">
-                <button type="button" onClick={handleNotify}>
-                     <i>🔔</i>
-                </button>
-            </div>
             <div className="add-trans">
                 <button type="button" onClick={()=> setIsModalOpen(true)}>+ Add Transaction</button>
             </div>

@@ -15,7 +15,7 @@ function Categories(){
     return (
         <div className="page-container">
             <div className="page-header">
-                <h2>Categories</h2>
+                <h2>Manage your categories</h2>
             </div>
 
            <div className="categories-grid">

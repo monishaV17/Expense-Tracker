@@ -3,10 +3,10 @@
 }
 
 .page-header h2 {
-  margin: 0 0 24px 0;
-  font-size: 24px;
+  margin: 0 0 40px 0;
+  font-size: 20px;
   color: var(--text);
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
 .categories-grid {

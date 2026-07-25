@@ -31,52 +31,88 @@
 }
 
 .logo-name{
-  font-size: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--text);
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 
+               'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.user{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.user-avatar{
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--blue-light);
+  color: var(--blue);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.user-info{
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.user-name{
+  font-size: 13px;
   font-weight: 600;
   color: var(--text);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
-.balance-card{
-  margin: 12px;
-  background: var(--blue);
-  border-radius: 10px;
-  padding: 14px;
-  color: #ffffff;
-}
-
-.balance-label{
-  font-size: 10px;
-  opacity: 0.7;
-  text-transform: uppercase;
-  display: block;
-}
-
-.balance-amount{
-  font-size: 22px;
-  font-weight: 600;
-  margin: 4px 0 3px;
-}
-
-.balance-available{
+.user-email{
   font-size: 11px;
-  opacity: 0.8;
-}
-
-.sidebar-nav{
-  flex: 1;
-  padding: 6px 0;
-}
-
-.nav-section-label{
-  display: block;
-  font-size: 10px;
-  font-weight: 600;
   color: var(--text-muted);
-  text-transform: uppercase;
-  padding: 10px 16px 4px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
-.nav-list{
+.user-createdat{
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.nav-sidebar{
+  flex: 1;
+  padding: 12px 0;
+  overflow-y: auto;
+}
+
+.menu-section{
+  margin-bottom: 16px;
+}
+
+.section-title{
+  display: block;
+  text-align: start;
+  padding: 0 16px;
+  margin-bottom: 6px;
+  font-size: 11px;
+  color: #5f6c7c;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.nav-sidebar ul {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -91,75 +127,47 @@
   color: var(--text);
   cursor: pointer;
   border-left: 3px solid transparent;
+  transition: all 0.2s ease;
 }
 
 .nav-item:hover{
-  background: var(--nav-hover);
+  background: #f3f4f6;
+  color: rgba(0, 0, 0, 0.508);
 }
 
 .nav-item.active{
-  background: var(--blue-light);
   color: var(--blue);
   border-left-color: var(--blue);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .nav-item i{
   font-size: 17px;
 }
 
-.nav-label{
-  flex: 1;
-  color: var(--text);
-}
-
-.nav-badge{
-  background: #fee2e2;
-  color: #ef4444;
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 7px;
-  border-radius: 20px;
-}
-
-.sidebar-user{
+.logout-card{
   border-top: 1px solid var(--border);
   padding: 12px 14px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
+  margin-top: auto;
 }
 
-.user-avatar{
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--blue-light);
-  color: var(--blue);
-  font-size: 11px;
-  font-weight: 600;
+.logout-btn{
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.user-name{
+  gap: 8px;
+  padding: 8px 12px;
+  background: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #fee2e2;
+  border-radius: 6px;
   font-size: 13px;
   font-weight: 500;
-  color: var(--text);
+  cursor: pointer;
+  transition: background 0.2s ease;
 }
 
-.user-email{
-  font-size: 11px;
-  color: var(--text-muted);
-}
-
-.section-title{
-  text-align: start;
-  margin-left: 10px;
-  padding: 0%;
-  font-size: 13px;
-  color: #5f6c7c;
-  font-weight:bold;
+.logout-btn:hover{
+  background: #fee2e2;
 }

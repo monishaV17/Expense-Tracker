@@ -9,9 +9,11 @@
 }
 
 .top-bar h3{
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 600;
   color: var(--text);
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 
+  'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
   flex: 1;
 }
 
@@ -29,24 +31,6 @@
 
 .search:focus{
   border-color: var(--blue);
-}
-
-.notification button{
-  width: 36px;
-  height: 36px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
-  cursor: pointer;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-}
-
-.notification button:hover{
-  background: var(--nav-hover);
 }
 
 .add-trans button{
