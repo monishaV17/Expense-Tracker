@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
+import { useNavigate } from 'react-router-dom';
 import "../static/Auth.css";
 
-const API_URL = "http://127.0.0.1:5000"
+const API_URL = "http://127.0.0.1:5000/api/auth";
 
 function Auth(){
     const[isLogin,setIsLogin]=useState(true);
@@ -9,55 +10,78 @@ function Auth(){
     const[email,setEmail]=useState("");
     const[password,setPassword]=useState("");
     const[confirmPassword,setConfirmPassword]=useState("");
-    const[error,setError]=useState('');
     const[message,setMessage]=useState("");
 
+    const navigate = useNavigate();
 
      const showMessage=(text) => {
             setMessage(text);
             setTimeout(() => {
             setMessage("");
-    }, 1000);
+    }, 2000);
   }
 
-     const handleSubmit=(e)=>{
+    const resetForm = () =>{
+        setUserName('');
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+    }
+
+     const handleSubmit=async (e)=>{
         e.preventDefault();
          if(!username || !password){
-            showMessage('Username and Passwords are required!');
+            showMessage('Username and Password are required!');
             return;
          }
+
+         if(!isLogin) {
+            if(!email) {
+                showMessage('Email is required for registration!');
+                return;
+            }
+            if(password !== confirmPassword) {
+                showMessage('Passwords do not match!');
+                return;
+            }
+        }
+
+        const endpoint=isLogin ? `${API_URL}/login` : `${API_URL}/register`;
+        const payload=isLogin ? {username,password} : {username,email,password};
+
         try{
-            const res=await fetch(`${API_URL}/register`,{
+            const res=await fetch(endpoint,{
                 method: 'POST',
                 headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({username,email,password,confirmPassword})
+                body: JSON.stringify(payload)
             });
 
             const data=await res.json();
             if(res.ok){
-                showMessage(data.message ||"User registered successfully");
-                setName('');
-                setEmail('');
-                setPassword('');
-                setConfirmPassword('');
+                if(data.token){
+                    localStorage.setItem('token',data.token)
+                }
+                showMessage(data.message || (isLogin ? "Login Successful!" : "Registered Successfully!"));
+                resetForm();
+
+                setTimeout(() => {
+                navigate('/dashboard');
+                }, 1000);
             }
             else{
-                showMessage(data.error || data.message || "Register failed");
+                showMessage(data.error || data.message || "Authentication failed");
             }
         }
         catch(error){
-            console.error("Register fetch error:", error);
+            console.error("Auth fetch error:", error);
             showMessage('Failed to connect server');
         }
-    }
+    };
 
     const handleToggle=()=>{
         setIsLogin(!isLogin);
-        setName('');
-        setEmail('');
-        setPassword('');
-        setConfirmPassword('');
-        setError('');
+        setMessage('');
+        resetForm();
     }
 
     return(
