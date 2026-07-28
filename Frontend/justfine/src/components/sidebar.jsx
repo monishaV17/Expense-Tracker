@@ -10,6 +10,14 @@ function SideBar(){
     const location=useLocation();
     const [created_at,setCreated_at]=useState("");
     const[userInfo,setUserInfo]=useState({username:'',email:'',created_at:''});
+    const[message,setMessage]=useState("");
+
+    const showMessage=(text) => {
+        setMessage(text);
+        setTimeout(() => {
+        setMessage("");
+        }, 2000);
+    }
 
     const sidebarData = [
       {
@@ -68,12 +76,30 @@ function SideBar(){
         }
     }
     fetchUserInfo();
-    },[navigate('/dashboard')]);
+    },[navigate]);
 
-    const handleLogout= ()=> {
-        localStorgae.removeItem(token);
-        navigate('/login');
-    };
+    const handleLogout=async()=>{
+        const token=localStorage.getItem('token');
+        try{
+            const response=await fetch(`${API_URL}/logout`,{
+                method:'POST',
+                headers:{'Authorization':`Bearer ${token}`},
+                'Content-Type': 'application/json'
+            })
+            if(response.ok){
+                const data=await response.json();
+                showMessage(data.message)
+        }
+        }
+        catch(error){
+            console.error('Error logging out:',error);
+        }
+        finally{
+            localStorage.removeItem('token');
+            window.location.href = '/';
+            
+        }
+        }
 
     return(
         <aside className="sidebar">
@@ -121,6 +147,7 @@ function SideBar(){
                     <span>Logout</span>
                 </button>
             </div>
+            {message && <p className="message">{message}</p>}
         </aside>
     );
 }
