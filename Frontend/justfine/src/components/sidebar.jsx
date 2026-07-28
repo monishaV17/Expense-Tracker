@@ -1,10 +1,15 @@
 import React from "react";
 import '../static/sidebar.css';
 import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+
+const API_URL = "http://127.0.0.1:5000/api/auth";
 
 function SideBar(){
-    const navigate = useNavigate();
-    const location = useLocation();
+    const navigate=useNavigate();
+    const location=useLocation();
+    const [created_at,setCreated_at]=useState("");
+    const[userInfo,setUserInfo]=useState({username:'',email:'',created_at:''});
 
     const sidebarData = [
       {
@@ -31,7 +36,42 @@ function SideBar(){
       }
     ];
 
-    const handleLogout = () => {
+    useEffect(()=>{
+    const fetchUserInfo=async()=>{
+        const token=localStorage.getItem("token");
+        if(!token){
+            navigate('/login');
+            return;
+        }
+        try{
+            const response=await fetch(`${API_URL}/me`,{
+                method:'GET',
+                headers: {Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+             }
+            });
+            if(!response.ok){
+                throw new Error('Failed to fetch user info');
+            }
+            const data=await response.json();
+            setUserInfo({username:data.username,
+                email:data.email,
+                created_at:data.created_at ? new Date(data.created_at).toLocaleDateString() : ""
+            })
+        }catch(error){
+            console.error('Error fetching user info:',error);
+            setUser({
+                username: 'Unknown',
+                email: '',
+                created_at: ''
+            });
+        }
+    }
+    fetchUserInfo();
+    },[navigate('/dashboard')]);
+
+    const handleLogout= ()=> {
+        localStorgae.removeItem(token);
         navigate('/login');
     };
 
@@ -49,9 +89,10 @@ function SideBar(){
                     <i className="ti ti-user" />
                 </div>
                 <div className="user-info">
-                    <div className="user-name">Moni</div>
-                    <div className="user-email">moni@example.com</div>
-                    <div className="user-createdat">2022-07-22 20:43</div>
+                    <div className="user-name">{userInfo.username}</div>
+                    <div className="user-email">{userInfo.email}</div>
+                    {userInfo.created_at && (<div className="user-createdat">Joined on : {userInfo.created_at}  
+                    </div>)}
                 </div>
             </div>
 

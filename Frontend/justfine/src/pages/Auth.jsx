@@ -59,6 +59,7 @@ function Auth(){
             const data=await res.json();
             if(res.ok){
                 if(data.token){
+                    console.log("Token saved successfully:",data.token);
                     localStorage.setItem('token',data.token)
                 }
                 showMessage(data.message || (isLogin ? "Login Successful!" : "Registered Successfully!"));
