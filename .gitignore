@@ -8,6 +8,10 @@ Frontend/justfine/.vite/
 Frontend/justfine/.eslintcache
 Frontend/justfine/.turbo/
 
+Backend/venv/
+Backend/__pycache__/
+Backend/instance/
+
 .vscode/
 .idea/
 .DS_Store
