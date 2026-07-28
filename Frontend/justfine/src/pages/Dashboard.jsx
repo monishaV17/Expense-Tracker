@@ -2,6 +2,7 @@ import React, { useState, useEffect} from "react";
 import '../static/Dashboard.css';
 import {Pie} from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import TransactionModal from "./TransactionModal";
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -13,12 +14,21 @@ function Dashboard(){
         { bankName: "SBI BANK", balance: '₹17750', type: "Savings" },
         { bankName: "PETTY CASH", balance: '₹2500', type: "Cash" }
     ]);
-    const [categories, setCategories] = useState([
+
+    const[categories,setCategories]=useState([
                         { name: "Food", count: 5, color: "#2563eb" },
                         { name: "Transport", count: 3, color: "#f59e0b" },
                         { name: "Bills & Utilities", count: 2, color: "#10b981" },
                         { name: "Shopping", count: 4, color: "#ef4444" }
                         ]);
+
+    const[isModalOpen,setIsModalOpen]=useState(false);
+    const[selectedType,setSelectedType]=useState("expense");
+
+    const openModal=(type)=>{
+        setSelectedType(type);
+        setIsModalOpen(true);
+      };
 
     const data={
             labels: categories.map(c => c.name),
@@ -38,6 +48,10 @@ function Dashboard(){
     }
     };
 
+    const handleAddTransaction=(newTransaction) => {
+        console.log("Transaction Added:", newTransaction);
+    }
+
     return(
         <div className="dashboard-card">
             <div className="dashboard-top-row">
@@ -46,13 +60,13 @@ function Dashboard(){
                 <h3 className="dashboard-balance-amount">₹1</h3>
                 <div className="dashboard-balance-available">Available ₹0</div>
                 <div className="transaction-type">
-                    <button className="btn">
+                    <button className="btn" onClick={() => openModal("income")}>
                         <i className="ti ti-arrow-down-left"></i>Income
                     </button>
-                    <button className="btn">
+                    <button className="btn" onClick={() => openModal("expense")}>
                         <i className="ti ti-arrow-up-right"></i>Expense
                     </button>
-                    <button className="btn">
+                    <button className="btn" onClick={() => openModal("transfer")}>
                         <i className="ti ti-arrows-exchange"></i>Transfer
                     </button>
                 </div>
@@ -76,6 +90,9 @@ function Dashboard(){
                     </div>
                 ))}
             </div>
+            <TransactionModal isOpen={isModalOpen} initialType={selectedType}
+                              onClose={() => setIsModalOpen(false)}
+                              onAdd={handleAddTransaction}/>
     </div>
     );
 }

@@ -1,7 +1,7 @@
-import React, {useState} from "react";
+import React, {useState,useEffect} from "react";
 import '../static/ModalTransac.css';
 
-function TransactionModal({isOpen, onClose, onAdd}){
+function TransactionModal({isOpen, onClose, onAdd, initialType}){
 
     const transactionTypes=[
         { id: "income", name: "Income" },
@@ -38,6 +38,15 @@ function TransactionModal({isOpen, onClose, onAdd}){
         description: "",
         date: ""
     });
+
+    useEffect(()=>{
+        if(isOpen) {
+          setFormData((prev)=>({
+            ...prev,
+            txn_type: initialType,
+          }));
+        }
+      }, [isOpen, initialType]);
 
     const handleClose=(e)=>{
         if(e){
