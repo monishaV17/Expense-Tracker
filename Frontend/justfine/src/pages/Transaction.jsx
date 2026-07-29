@@ -19,24 +19,21 @@ function Transaction(){
     }, 2000);
     }
     const filters = ["All", "Income", "Expense", "Transfer", "Debts"];
-    const filteredTransactions=active === "All" ? transactions : 
-                    transactions.filter((tx)=> tx.txn_type.toLowerCase() === active.toLowerCase());
+    const filteredTransactions = active === "All" ? transactions : active === "Debts"
+                                ? transactions.filter((tx) => tx.txn_type === "debt_in" ||
+                                tx.txn_type === "debt_out") : transactions.filter(
+                                (tx) => tx.txn_type.toLowerCase() === active.toLowerCase());
                 
     const openEditModal=(transaction) => {
         setEditingTransaction(transaction);
         setIsModalOpen(true);
     };
 
-    const handleDelete = (id) => {
-        setTransactions((prev) => prev.filter((item) => item.id !== id));
-    };
-
-    const fetchTransactions=async()=>{
+    const fetchTransactions = async()=>{
         try{
             const token=localStorage.getItem("token");
-            const response=await fetch(`${API_URL}/transactions`,{
-                headers:{Authorization: `Bearer ${token}`,
-            },
+            const response = await fetch(`${API_URL}/transactions`,{
+                headers:{Authorization: `Bearer ${token}`,},
         });
     const data=await response.json();
         console.log("Status:", response.status);
@@ -57,9 +54,30 @@ function Transaction(){
         fetchTransactions();
     },[]);
 
+    const handleDelete = async (id)=>{
+        try{
+            const token = localStorage.getItem("token");
+            const response = await fetch(`${API_URL}/transactions/${id}`,{
+                method : "DELETE",
+                headers : {Authorization : `Bearer ${token}`,},
+            });
+
+            const data = await response.json();
+            if(response.ok){
+                fetchTransactions();
+            }
+            else{
+                showMessage(data.error || "Failed to delete transaction");
+            }
+        } catch(err){
+            console.error(err);
+        }
+    };
+
     return (
         <div className="transaction-page">
             <h2>All Transactions</h2>
+            <FilterBox filters={filters} active={active} onChange={setActive} />
                 {filteredTransactions.length === 0 ? (
                     <p className="empty-state">No transactions yet</p>
                 ) : (
@@ -81,11 +99,12 @@ function Transaction(){
                         ))}
                     </ul>
                     )}
+                    {message && <p className="message">{message}</p>}
                     <TransactionModal
                     isOpen={isModalOpen}
                     editingTransaction={editingTransaction}
                     onClose={() => setIsModalOpen(false)}
-                    onAdd={()=>{}} />
+                    onAdd={fetchTransactions} />
         </div>
     );
 }

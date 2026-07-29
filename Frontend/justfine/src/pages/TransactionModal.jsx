@@ -62,7 +62,8 @@ function TransactionModal({ isOpen, onClose, onAdd, initialType, editingTransact
                 category_id: editingTransaction.category_id || "",
                 source_id: editingTransaction.source_id || "",
                 description: editingTransaction.description || "",
-                created_at: editingTransaction.created_at || "",
+                created_at: editingTransaction.created_at ? 
+                            editingTransaction.created_at.split("T")[0] : ""
             });
         }
         else{
@@ -84,7 +85,13 @@ function TransactionModal({ isOpen, onClose, onAdd, initialType, editingTransact
             e.preventDefault();
             e.stopPropagation();
         }
-        setFormData({ amount: "", txn_type: "expense", category_id: "", source_id: "", description: "", created_at: "" });
+        setFormData({ amount: "", 
+            txn_type: "expense", 
+            category_id: "", 
+            source_id: "", 
+            description: "", 
+            created_at: "" });
+            
         setError(null);
         if(typeof onClose === "function"){
             onClose();
@@ -110,15 +117,16 @@ function TransactionModal({ isOpen, onClose, onAdd, initialType, editingTransact
         };
 
         try{
-            const token=localStorage.getItem("token");
-            const url=editingTransaction ? `${API_URL}/transactions/${editingTransaction.id}`
+            const token = localStorage.getItem("token");
+            const url = editingTransaction ? `${API_URL}/transactions/${editingTransaction.id}`
                                          : `${API_URL}/transactions`;
-            const method=editingTransaction ? "PUT" : "POST";
+            const method = editingTransaction ? "PUT" : "POST";
 
-            const response=await fetch(url, {
+            const response = await fetch(url, {
+                method: method,
                 headers: {
                     Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
                 body: JSON.stringify(payload)
             });
@@ -126,7 +134,7 @@ function TransactionModal({ isOpen, onClose, onAdd, initialType, editingTransact
             const data=await response.json();
             if(response.ok) {
                 if(typeof onAdd === "function"){
-                    onAdd(data);
+                    onAdd();
                 }
                 showMessage(data.message || (editingTransaction ? "Transaction updated successfully" 
                             : "Transaction addedd successfully"));
@@ -209,7 +217,8 @@ function TransactionModal({ isOpen, onClose, onAdd, initialType, editingTransact
                     />
 
                     <button type="submit" disabled={loading}>
-                        {loading ? "Adding..." : "Add Transaction"}
+                        {loading ? (editingTransaction ? "Updating..." : "Adding...")
+                                 : (editingTransaction ? "Update Transaction" : "Add Transaction")}
                     </button>
                 </form>
             </div>

@@ -6,6 +6,7 @@ import TransactionModal from "./TransactionModal";
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
+const API_URL = "http://127.0.0.1:5000/api";
 
 function Dashboard(){
 
@@ -22,8 +23,10 @@ function Dashboard(){
                         { name: "Shopping", count: 4, color: "#ef4444" }
                         ]);
 
-    const[isModalOpen,setIsModalOpen]=useState(false);
-    const[selectedType,setSelectedType]=useState("expense");
+    const[isModalOpen,setIsModalOpen] = useState(false);
+    const[selectedType,setSelectedType] = useState("expense");
+    const[balance,setBalance] = useState(0);
+    const[transactions,setTransactions] = useState([]);
 
     const openModal=(type)=>{
         setSelectedType(type);
