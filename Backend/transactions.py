@@ -59,20 +59,26 @@ def add_transaction():
     txn_type = data.get('txn_type', 'expense')
     if txn_type not in ('income', 'expense', 'transfer', 'debt_in', 'debt_out', 'adjustment'):
         return jsonify({'error': 'Invalid txn_type'}), 400
-
+    
+    created_at = data.get("created_at")
+    if created_at:
+        created_at = datetime.strptime(created_at, "%Y-%m-%d")
+    else:
+        created_at = datetime.utcnow()
+        
     transaction = Transaction(
-        user_id=g.user_id,
-        amount=amount,
-        txn_type=txn_type,
-        description=data.get('description', '').strip() or None,
-        category_id=data.get('category_id'),
-        source_id=source_id,
-        partition_id=data.get('partition_id'),
-        destination_source_id=data.get('destination_source_id'),
-        debt_id=data.get('debt_id'),
-        coupon_id=data.get('coupon_id'),
-        created_at=data.get('created_at')  
-    )
+    user_id=g.user_id,
+    amount=amount,
+    txn_type=txn_type,
+    description=data.get('description', '').strip() or None,
+    category_id=data.get('category_id'),
+    source_id=source_id,
+    partition_id=data.get('partition_id'),
+    destination_source_id=data.get('destination_source_id'),
+    debt_id=data.get('debt_id'),
+    coupon_id=data.get('coupon_id'),
+    created_at=created_at
+)
     db.session.add(transaction)
     db.session.commit()
 
