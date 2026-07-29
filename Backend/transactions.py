@@ -70,7 +70,8 @@ def add_transaction():
         partition_id=data.get('partition_id'),
         destination_source_id=data.get('destination_source_id'),
         debt_id=data.get('debt_id'),
-        coupon_id=data.get('coupon_id')
+        coupon_id=data.get('coupon_id'),
+        created_at=data.get('created_at')  
     )
     db.session.add(transaction)
     db.session.commit()
