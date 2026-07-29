@@ -205,5 +205,5 @@ body{
   font-size: 14px;
   font-weight: 500;
   z-index: 999;
-  border: 1px solid #94a3b8; /* Added width (1px) and style (solid) */
+  border: 1px solid #94a3b8; 
 }

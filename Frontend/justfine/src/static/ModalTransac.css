@@ -64,3 +64,17 @@
     color: var(--blue);
     margin-left: 5px;
 }
+.message{
+    position: fixed;
+    top: 600px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: whitesmoke;
+    color: #2563eb;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 999;
+    border: 1px solid #94a3b8; /* Added width (1px) and style (solid) */
+  }

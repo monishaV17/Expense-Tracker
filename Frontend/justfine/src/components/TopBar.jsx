@@ -18,7 +18,7 @@ const handleNotify=()=>{
             <input className="search" type="text" placeholder="🔍 Search transactions..." value={search} onChange={(e)=> setSearch(e.target.value)}/>
             <ToggleTheme /> 
             <div className="add-trans">
-                <button type="button" onClick={()=> setIsModalOpen(true)}>+ Add Transaction</button>
+                <button type="button" onClick={(handleTransaction)=> setIsModalOpen(true)}>+ Add Transaction</button>
             </div>
             <TransactionModal
                 isOpen={isModalOpen}
