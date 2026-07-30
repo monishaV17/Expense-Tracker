@@ -2,6 +2,7 @@ import {useState, useEffect} from "react";
 import '../static/Transaction.css';
 import FilterBox from '../components/FilterBox';
 import TransactionModal from './TransactionModal';
+import fetchTransactions  from "../api/transactions";
 
 const API_URL = "http://127.0.0.1:5000/api";
 
@@ -29,29 +30,16 @@ function Transaction(){
         setIsModalOpen(true);
     };
 
-    const fetchTransactions = async()=>{
-        try{
-            const token=localStorage.getItem("token");
-            const response = await fetch(`${API_URL}/transactions`,{
-                headers:{Authorization: `Bearer ${token}`,},
-        });
-    const data=await response.json();
-        console.log("Status:", response.status);
-        console.log("Data:", data);
-        if(response.ok){
-            setTransactions(data);
-        }
-        else{
-            showMessage(data.error || "Failed to fetch transactions");
-        }
-    }
-    catch(err){
-        console.error("Error fetching transactions:",err);
-    }
-};
-
     useEffect(()=>{
-        fetchTransactions();
+        const loadTransactions = async () =>{
+            try{
+                const data = await fetchTransactions();
+                setTransactions(data);
+            } catch(err){
+                showMessage(err.message);
+            }
+        };
+        loadTransactions();
     },[]);
 
     const handleDelete = async (id)=>{

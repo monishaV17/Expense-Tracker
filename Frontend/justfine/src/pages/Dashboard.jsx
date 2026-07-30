@@ -3,18 +3,15 @@ import '../static/Dashboard.css';
 import {Pie} from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import TransactionModal from "./TransactionModal";
+import fetchTransactions from "../api/transactions";
+import sources from "../api/sources";
+import fetchSources from "../api/sources";
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
-const API_URL = "http://127.0.0.1:5000/api";
-
 function Dashboard(){
 
-    const [accounts,setAccounts]=useState([
-        { bankName: "HDFC BANK", balance: '₹20000', type: "Checking" },
-        { bankName: "SBI BANK", balance: '₹17750', type: "Savings" },
-        { bankName: "PETTY CASH", balance: '₹2500', type: "Cash" }
-    ]);
+    const [accounts,setAccounts]=useState([]);
 
     const[categories,setCategories]=useState([
                         { name: "Food", count: 5, color: "#2563eb" },
@@ -26,6 +23,7 @@ function Dashboard(){
     const[isModalOpen,setIsModalOpen] = useState(false);
     const[selectedType,setSelectedType] = useState("expense");
     const[balance,setBalance] = useState(0);
+    const[availableBalance,setAvailableBalance] = useState(0);
     const[transactions,setTransactions] = useState([]);
 
     const openModal=(type)=>{
@@ -51,17 +49,55 @@ function Dashboard(){
     }
     };
 
-    const handleAddTransaction=(newTransaction) => {
-        console.log("Transaction Added:", newTransaction);
-    }
+    const loadTransactions = async () => {
+        try{
+            const data = await fetchTransactions();
+            setTransactions(data);
+        } catch(err){
+            console.error(err);
+        }
+    };
 
+    useEffect(()=>{
+        loadTransactions();
+    },[]);
+
+    useEffect(()=>{
+        let total = 0, totalExpense=0;
+        transactions.forEach((tx) =>{
+            if(tx.txn_type === "income" || tx.txn_type === "debt_in"){
+                total += tx.amount;
+            }
+            else if(tx.txn_type === "expense" || tx.txn_type === "debt_out"){
+                 totalExpense += tx.amount;
+            }
+        });
+        const available = total - totalExpense;
+        setBalance(total);
+        setAvailableBalance(available);
+    },[transactions]);
+
+    const loadSources = async () =>{
+        try{
+            const data = await fetchSources();
+            setAccounts(data);
+        }
+        catch(err){
+            console.error(err);
+        }
+    };
+
+    useEffect(() => {
+        loadSources();
+    }, []);
+    
     return(
         <div className="dashboard-card">
             <div className="dashboard-top-row">
             <div className="dashboard-balance-card">
                 <span className="dashboard-balance-label">TOTAL BALANCE</span>
-                <h3 className="dashboard-balance-amount">₹1</h3>
-                <div className="dashboard-balance-available">Available ₹0</div>
+                <h3 className="dashboard-balance-amount">₹{balance.toLocaleString("en-IN")}</h3>
+                <div className="dashboard-balance-available">Available ₹{availableBalance.toLocaleString("en-IN")}</div>
                 <div className="transaction-type">
                     <button className="btn" onClick={() => openModal("income")}>
                         <i className="ti ti-arrow-down-left"></i>Income
@@ -85,17 +121,20 @@ function Dashboard(){
             </div>
 
             <div className="dashboard-account">
-                {accounts.map((acc, index)=>(
+                {accounts.length > 0 ? (
+                    accounts.map((acc, index)=>(
                     <div className="account-card" key={index}>
-                    <span className="name">{acc.bankName}</span>
-                    <p className="balance">{acc.balance}</p>
-                    <span className="type">{acc.type}</span>
+                    <span className="name">{acc.name.toUpperCase()}</span>
+                    <p className="balance">{(acc.amount/100).toLocaleString("en-IN")}</p>
+                    <span className="type">{acc.is_savings ? "Savings" : "Checking"}</span>
                     </div>
-                ))}
+                ))
+                ) : (<p>No accounts yet</p>)
+            }
             </div>
             <TransactionModal isOpen={isModalOpen} initialType={selectedType}
                               onClose={() => setIsModalOpen(false)}
-                              onAdd={handleAddTransaction}/>
+                              onAdd={loadTransactions}/>
     </div>
     );
 }
