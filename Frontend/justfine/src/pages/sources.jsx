@@ -1,26 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import '../static/sources.css';
 import FilterBox from '../components/FilterBox';
 import SourceModal from './SourceModal.jsx';
 import PartitionsModal from "./PartitionsModal.jsx";
-
-
-const INITIAL_SOURCES = [
-    {
-        id: 1, name: "HDFC Bank", description: "Primary salary account", amount: 2000000, is_savings: true, is_active: true, transaction_count: 14,
-        partitions: [{ id: 1, name: "My Salary", amount: 1200000 }, { id: 2, name: "House Rent", amount: 800000 }]
-    },
-    {
-        id: 2, name: "SBI Bank", description: "Secondary account", amount: 1775000, is_savings: false, is_active: true, transaction_count: 8,
-        partitions: [{ id: 3, name: "Emergency Fund", amount: 1000000 }, { id: 4, name: "Travel Fund", amount: 775000 }]
-    },
-    { id: 3, name: "Petty Cash", description: "Daily expenses", amount: 250000, is_savings: false, is_active: true, transaction_count: 5, partitions: [] }
-];
+import {fetchSources, addSource} from "../api/sources.js";
 
 function Sources() {
     const [isSourceModalOpen, setIsSourceModalOpen]=useState(false);
     const [filter, setFilter]=useState("All");
-    const [sources, setSources]=useState(INITIAL_SOURCES);
+    const [sources, setSources]=useState([]);
     const [isPartitionModalOpen, setIsPartitionModalOpen]=useState(false);
     const [activeSourceIndex, setActiveSourceIndex]=useState(null);
 
@@ -32,16 +20,26 @@ function Sources() {
         return true;
     });
 
-    const handleAddSource=(newSource) => {
-        const formattedSource = {
-            ...newSource,
-            id: Date.now(),
-            amount: Number(newSource.amount) * 100,
-            is_active: true,
-            transaction_count: 0,
-            partitions: []
-        };
-        setSources([...sources, formattedSource]);
+    const loadSources = async () => {
+        try {
+            const data = await fetchSources();
+            setSources(data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    useEffect(() => {
+        loadSources();
+    }, []);
+
+    const handleAddSource = async (newSource) => {
+        try {
+            await addSource(newSource);
+            loadSources();
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     const handleAddPartition=(newPartition) => {
@@ -82,7 +80,7 @@ function Sources() {
                         </div>
                         <div className="src-right">
                          <span className="src-amt">₹{s.amount / 100}</span>
-                        <span className="src-txn">{s.transaction_count} transactions</span>
+                        <span className="src-txn">{s.count} transactions</span>
                         </div>
                         </div>
 

@@ -18,7 +18,10 @@ function SourceModal({ isOpen, onClose, onAdd }){
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onAdd(formData);
+        const payload = {
+            ...formData, amount: Number(formData.amount)/100
+        };
+        onAdd(payload);
         setFormData(INITIAL_FORM_STATE);
         onClose();
     };

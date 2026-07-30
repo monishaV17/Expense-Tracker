@@ -4,7 +4,6 @@ import {Pie} from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import TransactionModal from "./TransactionModal";
 import fetchTransactions from "../api/transactions";
-import sources from "../api/sources";
 import fetchSources from "../api/sources";
 
 ChartJS.register(ArcElement, Tooltip, Legend)
@@ -125,7 +124,7 @@ function Dashboard(){
                     accounts.map((acc, index)=>(
                     <div className="account-card" key={index}>
                     <span className="name">{acc.name.toUpperCase()}</span>
-                    <p className="balance">{(acc.amount/100).toLocaleString("en-IN")}</p>
+                    <p className="balance">₹{(acc.amount/100).toLocaleString("en-IN")}</p>
                     <span className="type">{acc.is_savings ? "Savings" : "Checking"}</span>
                     </div>
                 ))
