@@ -31,7 +31,7 @@ const addSource = async () =>{
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`
             },
-            body: JSON.stringify(sourceData),
+            body: JSON.stringify(),
         });
         const data = await response.json();
 
