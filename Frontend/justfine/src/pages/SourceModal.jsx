@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import '../static/ModalTransac.css';
+
+const API_URL = "http://127.0.0.1:5000/api";
 
 const INITIAL_FORM_STATE={ name: "", description: "", amount: "", is_savings: false };
 
-function SourceModal({ isOpen, onClose, onAdd }){
+function SourceModal({ isOpen, onClose, onAdd, editingSource}){
     const [formData, setFormData]=useState(INITIAL_FORM_STATE);
-
-    if (!isOpen) return null;
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         const { name, value, type, checked }=e.target;
@@ -16,14 +18,74 @@ function SourceModal({ isOpen, onClose, onAdd }){
         }));
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const payload = {
-            ...formData, amount: Number(formData.amount)/100
-        };
-        onAdd(payload);
+    useEffect(()=>{
+        if(editingSource){
+            setFormData({name: editingSource.name || "",
+                        description: editingSource.description || "",
+                        amount: editingSource.amount ? editingSource.amount / 100 : "",
+                        is_savings: editingSource.is_savings || false,
+                        created_at: editingSource.created_at ? editingSource.created_at.split("T")[0] : ""});
+        }
+        else{
+            setFormData(INITIAL_FORM_STATE);
+        }
+        setError(null);
+    },[isOpen,editingSource]);
+
+    const handleClose=(e) => {
+        if(e){
+            e.preventDefault();
+            e.stopPropagation();
+        }
         setFormData(INITIAL_FORM_STATE);
+        setError(null);
         onClose();
+    };
+    
+    if(!isOpen) 
+        return null;
+
+    const handleSubmit=async (e) =>{
+        e.preventDefault();
+        setLoading(true);
+        setError(null);
+
+        const payload={
+            name: formData.name,
+            description: formData.description,
+            amount: parseFloat(formData.amount || 0) * 100,
+            is_savings: formData.is_savings
+        };
+
+        try{
+            const token = localStorage.getItem("token");
+            const url = editingSource ? `${API_URL}/sources/${editingSource.id}`
+                                         : `${API_URL}/sources`;
+            const method = editingSource ? "PUT" : "POST";
+
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data=await response.json();
+            if (response.ok) {
+                if (typeof onAdd === "function") {
+                    await onAdd(); 
+                }
+                onClose();
+            } else {
+                setError(data.message || (editingSource ? "Failed to update source" : "Failed to add source"));
+            }
+        } catch (err) {
+            setError(`Error occurred: ${err.message}`);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -41,7 +103,10 @@ function SourceModal({ isOpen, onClose, onAdd }){
                         <span className="savings-acc">Savings Account</span>
                     </label>
 
-                    <button type="submit">Add Source</button>
+                    <button type="submit" disabled={loading}>
+                    {loading ? (editingSource  ? "Updating..." : "Adding...")
+                                 : (editingSource ? "Update Source" : "Add Source")}
+                    </button>
                 </form>
             </div>
         </div>

@@ -4,7 +4,7 @@ import {Pie} from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import TransactionModal from "./TransactionModal";
 import fetchTransactions from "../api/transactions";
-import fetchSources from "../api/sources";
+import {fetchSources} from "../api/sources";
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 

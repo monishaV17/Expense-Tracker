@@ -20,7 +20,8 @@ function PartitionsModal({ isOpen, onClose, onAdd }){
         e.preventDefault();
         onAdd({
             name: formData.name,
-            amount: Number(formData.amount) * 100
+            amount: Number(formData.amount) * 100,
+            id: Date.now()
         });
         setFormData(INITIAL_FORM_STATE);
         onClose();

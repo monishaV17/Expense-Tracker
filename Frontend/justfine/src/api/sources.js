@@ -22,26 +22,26 @@ catch(err){
 }
 };
 
-const addSource = async () =>{
-    try{
-        const token = localStorage.getItem("token");
-        const response = await fetch(API_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`
-            },
-            body: JSON.stringify(sourceData),
-        });
-        const data = await response.json();
-
-        if(!response.ok){
-            throw new Error(data.error || "Failed to fetch sources");
+    const deleteSource = async (sourceId) => {
+        try{
+            const token = localStorage.getItem("token");
+            const response = await fetch(`${API_URL}/${sourceId}`,{
+                method: "DELETE",
+                
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                    }
+            });
+            const data = await response.json();
+            if(!response.ok){
+                throw new Error(data.error || "Failed to delete source");
+            }
+            return data;
         }
-        return data;
-    }   catch(err){
+        catch(err){
             throw err;
         }
     };
 
-export { fetchSources, addSource };
+export { fetchSources, deleteSource };

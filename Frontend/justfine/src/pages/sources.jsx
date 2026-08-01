@@ -1,16 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import '../static/sources.css';
 import FilterBox from '../components/FilterBox';
 import SourceModal from './SourceModal.jsx';
 import PartitionsModal from "./PartitionsModal.jsx";
-import {fetchSources, addSource} from "../api/sources.js";
+import {fetchSources, deleteSource} from "../api/sources.js";
 
 function Sources() {
-    const [isSourceModalOpen, setIsSourceModalOpen]=useState(false);
-    const [filter, setFilter]=useState("All");
-    const [sources, setSources]=useState([]);
-    const [isPartitionModalOpen, setIsPartitionModalOpen]=useState(false);
-    const [activeSourceIndex, setActiveSourceIndex]=useState(null);
+    const [isSourceModalOpen, setIsSourceModalOpen] = useState(false);
+    const [filter, setFilter] = useState("All");
+    const [sources, setSources] = useState([]);
+    const [isPartitionModalOpen, setIsPartitionModalOpen] = useState(false);
+    const [activeSourceIndex, setActiveSourceIndex] = useState(null);
+    const [editingSource, setEditingSource] = useState(null);
 
 
     const filteredSources = sources.filter(s => {
@@ -20,24 +21,29 @@ function Sources() {
         return true;
     });
 
-    const loadSources = async () => {
+    const loadSources = useCallback(async () => {
         try {
             const data = await fetchSources();
             setSources(data);
         } catch (err) {
             console.error(err);
         }
-    };
+    }, []);
 
     useEffect(() => {
         loadSources();
-    }, []);
+    }, [loadSources]);
 
-    const handleAddSource = async (newSource) => {
-        try {
-            await addSource(newSource);
+    const openEditModal= (source) => {
+        setEditingSource(source);
+        setIsSourceModalOpen(true);
+    };
+
+    const handleDeleteSource = async (sourceId) => {
+        try{
+            await deleteSource(sourceId);
             loadSources();
-        } catch (err) {
+        } catch(err){
             console.error(err);
         }
     };
@@ -104,15 +110,22 @@ function Sources() {
                         )} 
 
                         <div className="src-actions">
-                            <button className="action-btn">Edit</button>
+                            <button className="action-btn" onClick={()=> openEditModal(s)}>Edit</button>
                             <button className="action-btn" onClick={()=> setIsPartitionModalOpen(true)}>Partitions</button>
-                            <button className="action-btn delete">Delete</button>
+                            <button className="action-btn delete" onClick={()=> handleDeleteSource(s.id)}>Delete</button>
                         </div>
                     </div>
                 ))
             )}
 
-            <SourceModal isOpen={isSourceModalOpen} onClose={() => setIsSourceModalOpen(false)} onAdd={handleAddSource} />
+            <SourceModal isOpen={isSourceModalOpen} 
+            editingSource={editingSource}
+            onClose={() => {
+                setIsSourceModalOpen(false);
+                setEditingSource(null);
+            }}
+            onAdd={loadSources} />
+
             <PartitionsModal isOpen={isPartitionModalOpen} onClose={() => {
                 setIsPartitionModalOpen(false); 
                 setActiveSourceIndex(null);
