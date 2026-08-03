@@ -1,42 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
 import DebtsModal from "./DebtsModal"; 
 import "../static/DebtsLoan.css";
+import { fetchDebts, deleteDebts } from "../api/debts";
 
-const dummyDebts = [
-  {
-    id: 1,
-    name: "Rahul",
-    type: "owe",
-    amount: 500000,
-    paid_amount: 150000,
-    description: "Personal loan • Due Jun 15, 2026",
-    progress: 30
-  },
-  {
-    id: 2,
-    name: "HDFC Bank",
-    type: "owe",
-    amount: 5000000,
-    paid_amount: 250000,
-    description: "Home loan • EMI • Day 5",
-    extraInfo: "₹2,500/month",
-    emiProgress: "3 of 240 EMIs",
-    progress: 1.25
-  },
-  {
-    id: 3,
-    name: "Priya",
-    type: "lent",
-    amount: 500000,
-    paid_amount: 0,
-    description: "Borrowed for shopping",
-    progress: 0
-  }
-];
-
-function DebtsLoan({ debts = [], onAdd = () => {}, onEdit = () => {}, onDelete = () => {} }) {
+function DebtsLoan() {
+    const [debts, setDebts] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const displayDebts = debts.length > 0 ? debts : dummyDebts;
+    const [editingDebts, setEditingDebts] = useState(null);
+
+    const loadDebts = async ()=> {
+        try{
+            const data = await fetchDebts();
+            setDebts(data);
+        } catch(err){
+            console.error(err);
+        }
+    };
+
+    useEffect(()=>{
+        loadDebts();
+    },[]);
+
+    const openEditModal = (debt)=>{
+        setEditingDebts(debt);
+        setIsModalOpen(true);
+    };
+
+    const handleDelete = async (DebtId)=> {
+        try{
+            await deleteDebts(DebtId);
+            loadDebts();
+        } catch(err){
+            console.error(err);
+        }
+    };
 
     return (
         <div className="debts-page">
@@ -44,29 +41,31 @@ function DebtsLoan({ debts = [], onAdd = () => {}, onEdit = () => {}, onDelete =
                 <div>
                     <h2 className="debts-subtitle">Track who owes what</h2>
                 </div>
-                <button className="debts-add-btn" onClick={() => setIsModalOpen(true)}>
+                <button className="debts-add-btn" onClick={()=> {
+                    setEditingDebts(null);
+                    setIsModalOpen(true);
+                }}>
                     + Add Record
                 </button>
             </div>
 
             <div className="debts-list">
-                {displayDebts.map((d) => {
-                    const isOwe = d.type === "owe";
+                {debts.map((d) => {
+                    const isOwe = d.debt_type === "i_owe";
                     const remaining = d.amount - d.paid_amount;
                     
                     const percentPaid = d.progress !== undefined 
-                        ? d.progress 
-                        : (d.paid_amount / d.amount) * 100;
+                        ? d.progress : d.amount > 0 ? (d.paid_amount / d.amount) * 100 : 0;
 
                     return (
                         <div key={d.id} className="debt-card">
                             <div className="debt-header">
                                 <div className="debt-avatar">
-                                    {isOwe ? "🏢" : "👤"}
+                                    {d.emoji}
                                 </div>
                                 <div className="debt-title-area">
                                     <div className="debt-name-row">
-                                        <span className="debt-name">{d.name}</span>
+                                        <span className="debt-name">{d.person_name}</span>
                                         <span className={`badge ${isOwe ? "badge-owe" : "badge-lent"}`}>
                                             {isOwe ? "I OWE" : "LENT TO"}
                                         </span>
@@ -90,11 +89,12 @@ function DebtsLoan({ debts = [], onAdd = () => {}, onEdit = () => {}, onDelete =
                                 </div>
                             </div>
 
-                            {(d.extraInfo || d.emiProgress) && (
-                                <div className="debt-extra-info">
-                                    <span>{d.extraInfo}</span>
-                                    <span><strong>{d.emiProgress}</strong></span>
-                                </div>
+                            {d.total_emis && (
+                                 <div className="debt-extra-info">
+                                 <span>EMI: ₹{(d.emi_amount / 100).toLocaleString("en-IN")} / {d.emi_frequency}</span>
+                                 <span>Day {d.emi_day}</span>
+                                 <span>{d.emis_paid} of {d.total_emis} EMIs</span>
+                                 </div>
                             )}
 
                             <div className="debt-progress-bar-container">
@@ -109,8 +109,8 @@ function DebtsLoan({ debts = [], onAdd = () => {}, onEdit = () => {}, onDelete =
                                     {d.extraInfo && <span>{d.extraInfo}</span>}
                                 </div>
                                 <div className="debt-actions-group">
-                                    <button className="action-btn" onClick={() => onEdit(d)}>Edit</button>
-                                    <button className="action-btn delete" onClick={() => onDelete(d.id)}>Delete</button>
+                                    <button className="action-btn" onClick={() => openEditModal(d)}>Edit</button>
+                                    <button className="action-btn delete" onClick={() => handleDelete(d.id)}>Delete</button>
                                 </div>
                             </div>
                         </div>
@@ -118,17 +118,13 @@ function DebtsLoan({ debts = [], onAdd = () => {}, onEdit = () => {}, onDelete =
                 })}
             </div>
 
-            <DebtsModal 
-                isOpen={isModalOpen} 
-                onClose={() => setIsModalOpen(false)} 
-                onAdd={(formData) => {
-                    onAdd({
-                        ...formData,
-                        amount: Number(formData.amount) * 100,
-                        paid_amount: Number(formData.paid_amount || 0) * 100,
-                    });
-                }} 
-            />
+            <DebtsModal isOpen={isModalOpen}
+                editingDebts={editingDebts}
+                onClose={() => {
+                setIsModalOpen(false);
+                setEditingDebts(null);
+                }}
+                onAdd={loadDebts}/>
         </div>
     );
 }

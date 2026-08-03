@@ -1,7 +1,8 @@
 .debts-page{
     padding: 20px;
-    width: 1250px;
-    height: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
 .debts-top{
@@ -12,9 +13,24 @@
 
 .debts-subtitle{
     color: var(--text);
-    margin-bottom: 40px;
+    margin-bottom: 20px;
     font-size: 20px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-family: 'Lucida Sans','Lucida Sans Regular','Lucida Grande','Lucida Sans Unicode',Geneva,Verdana,sans-serif;
+}
+
+.debts-add-btn{
+    padding: 7px 14px;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.debts-add-btn:hover{
+    background: #608be7;
 }
 
 .debts-list{
@@ -28,7 +44,11 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 20px;
-    position: relative;
+    transition: 0.2s ease;
+}
+
+.debt-card:hover{
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 .debt-header{
@@ -39,56 +59,67 @@
 }
 
 .debt-avatar{
-    font-size: 20px;
+    font-size: 22px;
+}
+
+.debt-title-area{
+    flex: 1;
+}
+
+.debt-name-row{
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .debt-name{
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 700;
     color: var(--text);
-    margin-right: 8px;
 }
 
 .debt-description{
     font-size: 12px;
     color: var(--text-muted);
-    margin-top: 2px;
+    margin-top: 4px;
 }
 
 .badge{
     font-size: 10px;
-    font-weight: bold;
-    padding: 2px 6px;
-    border-radius: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 12px;
 }
 
-.badge-owe{ 
-    background: #ffebe9; 
-    color: #f15b5b; 
+.badge-owe{
+    background: #ffebe9;
+    color: #f15b5b;
 }
 
-.badge-lent{ 
-    background: #e6f9ed; 
-    color: #07563c; 
+.badge-lent{
+    background: #e6f9ed;
+    color: #07563c;
 }
 
 .debt-metrics-grid{
     display: flex;
     gap: 12px;
+    flex-wrap: wrap;
 }
 
 .metric-box{
     flex: 1;
+    min-width: 120px;
     background: #f4f6f8;
     border-radius: 8px;
-    padding: 10px;
+    padding: 12px;
     text-align: center;
 }
 
 .metric-label{
-    font-size: 9px;
-    color: #8c93a3;
     display: block;
+    font-size: 10px;
+    color: #8c93a3;
     margin-bottom: 4px;
 }
 
@@ -97,16 +128,16 @@
     font-weight: 700;
 }
 
-.metric-val.text-dark{ 
-    color: var(--blue); 
+.metric-val.text-dark{
+    color: var(--blue);
 }
 
-.metric-val.text-green{ 
-    color: #10b981; 
+.metric-val.text-green{
+    color: #10b981;
 }
 
-.metric-val.text-red{ 
-    color: #f15b5b; 
+.metric-val.text-red{
+    color: #ef4444;
 }
 
 .debt-extra-info{
@@ -119,29 +150,25 @@
 
 .debt-progress-bar-container{
     width: 100%;
-    height: 6px;
+    height: 8px;
     background: #e5e7eb;
     border-radius: 999px;
     overflow: hidden;
+    margin-top: 12px;
 }
 
 .debt-progress-fill{
     height: 100%;
     background: #16a34a;
     border-radius: inherit;
-    transition: width 0.2s ease;
-}
-
-.debt-actions{
-    display: flex;
-    gap: 6px;
+    transition: width 0.3s ease;
 }
 
 .debt-footer{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 12px;
+    margin-top: 14px;
     gap: 12px;
 }
 
@@ -152,34 +179,29 @@
 
 .debt-actions-group{
     display: flex;
-    gap: 10px;
+    gap: 8px;
 }
 
 .action-btn{
-    border: none;
-    background: transparent;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
     color: var(--blue);
-    cursor: pointer;
-    padding: 6px 10px;
-    border-radius: 8px;
     font-size: 12px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.action-btn:hover{
+    background: #eff6ff;
 }
 
 .action-btn.delete{
-    color: #ef4444;
+    color: #dc2626;
+    border-color: #fecaca;
 }
 
-.debts-add-btn{
-    padding: 7px 14px;
-    background: var(--blue);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 13px;
-    cursor: pointer;
-    margin-bottom: 40px;
-}
-
-.debts-add-btn:hover{
-    background: #608be7;
+.action-btn.delete:hover{
+    background: #fef2f2;
 }
