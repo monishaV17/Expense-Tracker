@@ -160,61 +160,37 @@ function TransactionModal({ isOpen, onClose, onAdd, initialType, editingTransact
                 {message && <div className="message">{message}</div>}
 
                 <form onSubmit={handleSubmit}>
-                    <input 
-                        type="number" 
-                        step="0.01"
-                        placeholder="₹ Amount" 
-                        value={formData.amount} 
-                        onChange={e => setFormData({ ...formData, amount: e.target.value })} 
-                        required 
-                    />
+                    <input type="number" step="0.01" placeholder="₹ Amount" value={formData.amount} 
+                        onChange={e => setFormData({ ...formData, amount: e.target.value })} required />
 
-                    <select 
-                        value={formData.txn_type}
-                        onChange={e => setFormData({ ...formData, txn_type: e.target.value })} 
-                        required 
-                    >
+                    <select value={formData.txn_type} onChange={e => setFormData({ ...formData, txn_type: e.target.value })} required >
                         <option value="">Select Type</option>
                         {transactionTypes.map((type) => (
                             <option key={type.id} value={type.id}>{type.name}</option>
                         ))}
                     </select>
 
-                    <select 
-                        value={formData.category_id} 
-                        onChange={e => setFormData({ ...formData, category_id: e.target.value })} 
-                        required 
-                    >
+                    <select value={formData.category_id} onChange={e => setFormData({ ...formData, category_id: e.target.value })} 
+                        required >
                         <option value="">Select Category</option>
                         {categories.map((category) => (
                             <option key={category.id} value={category.id}>{category.name}</option>
                         ))}
                     </select>
 
-                    <select 
-                        value={formData.source_id}
-                        onChange={e => setFormData({ ...formData, source_id: e.target.value })} 
-                        required 
-                    >
+                    <select value={formData.source_id} onChange={e => setFormData({ ...formData, source_id: e.target.value })} 
+                    required >
                         <option value="">Select Source</option>
                         {sources.map((source) => (
                             <option key={source.id} value={source.id}>{source.name}</option>
                         ))}
                     </select>
 
-                    <input 
-                        type="date" 
-                        value={formData.created_at} 
-                        onChange={e => setFormData({ ...formData, created_at: e.target.value })} 
-                        required 
-                    />
+                    <input type="date" value={formData.created_at} onChange={e => setFormData({ ...formData, created_at: e.target.value })} 
+                        required />
 
-                    <input 
-                        type="text" 
-                        placeholder="Description" 
-                        value={formData.description} 
-                        onChange={e => setFormData({ ...formData, description: e.target.value })} 
-                    />
+                    <input type="text" placeholder="Description" value={formData.description} 
+                        onChange={e => setFormData({ ...formData, description: e.target.value })} />
 
                     <button type="submit" disabled={loading}>
                         {loading ? (editingTransaction ? "Updating..." : "Adding...")

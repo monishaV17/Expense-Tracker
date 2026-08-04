@@ -22,7 +22,7 @@ function SourceModal({ isOpen, onClose, onAdd, editingSource}){
         if(editingSource){
             setFormData({name: editingSource.name || "",
                         description: editingSource.description || "",
-                        amount: editingSource.amount ? editingSource.amount / 100 : "",
+                        amount: editingSource.amount ? editingSource.amount : "",
                         is_savings: editingSource.is_savings || false,
                         created_at: editingSource.created_at ? editingSource.created_at.split("T")[0] : ""});
         }
@@ -53,7 +53,7 @@ function SourceModal({ isOpen, onClose, onAdd, editingSource}){
         const payload={
             name: formData.name,
             description: formData.description,
-            amount: parseFloat(formData.amount || 0) * 100,
+            amount: parseFloat(formData.amount || 0),
             is_savings: formData.is_savings
         };
 

@@ -1,30 +1,50 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import '../static/budget.css';
 import BudgetModal from "./BudgetModal";
+import { fetchBudgets, deleteBudgets } from "../api/budget";
+import { fetchSources } from "../api/sources";
 
-const budgetsData = [
-  {
-    id: 1,
-    source_id: "HDFC BANK",
-    category_id: "Food & Dining",
-    amount: 4000,
-    description: "Monthly groceries budget",
-    budget_date: "2026-07-31"
-  },
-  {
-    id: 2,
-    source_id: "SBI BANK",
-    category_id: "Shopping",
-    amount: 1800,
-    description: "Birthday gift for mom",
-    budget_date: "2026-07-21"
-  }
+const categories = [
+    { id: "1", name: "Food" },
+    { id: "2", name: "Shopping" },
+    { id: "3", name: "Transport" },
+    { id: "4", name: "Bills" },
+    { id: "5", name: "Entertainment" }
 ];
 
 function Budgets(){
-    const [budgets,setBudgets]=useState(budgetsData);
-    const [isModalOpen, setIsModalOpen]=useState(false);
-    const [editingBudget, setEditingBudget]=useState(null);
+    const [budgets,setBudgets] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingBudget, setEditingBudget] = useState(null);
+    const [error, setError] = useState(null);
+    const [sources, setSources] = useState([]);
+
+useEffect(() => {
+    const loadSources = async () => {
+        try {
+            const data = await fetchSources();
+            setSources(data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    loadSources();
+}, []);
+
+
+    const loadBudgets = async () => {
+        try{
+            const data = await fetchBudgets();
+            setBudgets(data);
+        } catch(err){
+            console.error(err);
+        }
+    };
+
+    useEffect(() => {
+        loadBudgets();
+    },[]);
 
     const openAddModal = () => {
         setEditingBudget(null);
@@ -36,16 +56,14 @@ function Budgets(){
         setIsModalOpen(true);
     };
 
-    const handleSaveBudget = (budget) => {
-        if (budget.id && budgets.some((item) => item.id === budget.id)) {
-            setBudgets((prev) => prev.map((item) => item.id === budget.id ? budget : item));
-        } else {
-            setBudgets((prev) => [{ ...budget, id: Date.now() }, ...prev]);
-        }
-    };
 
-    const handleDelete = (id) => {
-        setBudgets((prev) => prev.filter((item) => item.id !== id));
+    const handleDelete = async (id) => {
+        try{
+            await deleteBudgets(id);
+            loadBudgets();
+        } catch(err){
+            console.error(err);
+        }
     };
 
     return (
@@ -57,10 +75,10 @@ function Budgets(){
             <ul>
                 {budgets.map((bd) => (
                     <li key={bd.id} className="budget-item">
-                        <span className="bd-date">{bd.budget_date}</span>
+                        <span className="bd-date">{new Date(bd.budget_date).toLocaleDateString("en-IN")}</span>
                         <span className="bd-desc">{bd.description}</span><br />
-                        <span className="bd-source">{bd.source_id}</span>
-                        <span className="bd-category">{bd.category_id}</span>
+                        <span className="bd-source">{sources.find(s => s.id === bd.source_id)?.name}</span>
+                        <span className="bd-category">{categories.find(c => c.id === bd.category_id)?.name}</span>
                         <span className="bd-amount">₹{bd.amount}</span>
                         <div className="bd-actions-group"><br/>
                             <button className="bd-action-btn" onClick={() => openEditModal(bd)}>Edit</button>
@@ -74,7 +92,7 @@ function Budgets(){
                 isOpen={isModalOpen}
                 editingBudget={editingBudget}
                 onClose={() => setIsModalOpen(false)}
-                onAdd={handleSaveBudget}
+                onAdd={loadBudgets}
             />
         </div>
     );

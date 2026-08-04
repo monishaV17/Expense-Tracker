@@ -13,7 +13,7 @@ function PartitionsModal({ isOpen, onClose, onAdd, editingPartition, sourceId })
         if(editingPartition){
             setFormData({
                 name: editingPartition.name || "",
-                amount: editingPartition.amount ? editingPartition.amount / 100 : "",
+                amount: editingPartition.amount ? editingPartition.amount : "",
         });
     } else{
         setFormData(INITIAL_FORM_STATE);
@@ -36,7 +36,7 @@ function PartitionsModal({ isOpen, onClose, onAdd, editingPartition, sourceId })
         const payload = {
             source_id: sourceId,
             name: formData.name,
-            amount: Number(formData.amount) * 100,
+            amount: Number(formData.amount),
         };
         try{
             const token = localStorage.getItem("token");

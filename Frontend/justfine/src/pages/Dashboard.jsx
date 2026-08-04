@@ -124,7 +124,7 @@ function Dashboard(){
                     accounts.map((acc, index)=>(
                     <div className="account-card" key={index}>
                     <span className="name">{acc.name.toUpperCase()}</span>
-                    <p className="balance">₹{(acc.amount/100).toLocaleString("en-IN")}</p>
+                    <p className="balance">₹{(acc.amount).toLocaleString("en-IN")}</p>
                     <span className="type">{acc.is_savings ? "Savings" : "Checking"}</span>
                     </div>
                 ))

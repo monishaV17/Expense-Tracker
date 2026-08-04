@@ -90,7 +90,7 @@ function Sources() {
                         <span className="src-des">{s.description}</span>
                         </div>
                         <div className="src-right">
-                         <span className="src-amt">₹{s.amount / 100}</span>
+                         <span className="src-amt">₹{s.amount}</span>
                         <span className="src-txn">{s.count} transactions</span>
                         </div>
                         </div>
@@ -109,7 +109,7 @@ function Sources() {
                                     <div key={p.id} className="part-row">
                                         <span className="part-label">{p.name}</span>
                                         <div className="part-right">
-                                            <span className="part-amt">₹{p.amount / 100}</span>
+                                            <span className="part-amt">₹{p.amount}</span>
                                             <button className="part-edit-btn" onClick={() => openEditPartition(s, p)}>Edit</button>
                                             <button className="action-btn delete" onClick={() => handleDeletePartition(p.id)}>Delete</button>
                                         </div>
