@@ -45,7 +45,7 @@ def get_budgets():
 def add_budget():
     data = request.get_json()
 
-    amount = data.get('amount', 0)
+    amount = int(data.get('amount', 0))
     if amount <= 0:
         return jsonify({'error': 'Amount must be greater than 0'}), 400
 
