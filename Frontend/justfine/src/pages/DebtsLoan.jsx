@@ -45,12 +45,13 @@ function DebtsLoan() {
                     setEditingDebts(null);
                     setIsModalOpen(true);
                 }}>
-                    + Add Record
+                    + Add Debt
                 </button>
             </div>
 
             <div className="debts-list">
                 {debts.map((d) => {
+                    console.log(d);
                     const isOwe = d.debt_type === "i_owe";
                     const remaining = d.amount - d.paid_amount;
                     
@@ -70,28 +71,31 @@ function DebtsLoan() {
                                             {isOwe ? "I OWE" : "LENT TO"}
                                         </span>
                                     </div>
-                                    <div className="debt-description">{d.description}</div>
+                                    <div className="debt-description"><span>{d.description}</span>
+                                    {d.due_date && ( <span className="debt-due-date">• Due {new Date(d.due_date).toLocaleDateString("en-IN")}
+                                    </span>)}
+                                    </div>
                                 </div>
                             </div>
 
                             <div className="debt-metrics-grid">
                                 <div className="metric-box">
                                     <span className="metric-label">{isOwe ? "TOTAL" : "LENT"}</span>
-                                    <span className="metric-val text-dark">₹{(d.amount / 100).toLocaleString('en-IN')}</span>
+                                    <span className="metric-val text-dark">₹{(d.amount).toLocaleString('en-IN')}</span>
                                 </div>
                                 <div className="metric-box">
                                     <span className="metric-label">{isOwe ? "PAID" : "RETURNED"}</span>
-                                    <span className="metric-val text-green">₹{(d.paid_amount / 100).toLocaleString('en-IN')}</span>
+                                    <span className="metric-val text-green">₹{(d.paid_amount).toLocaleString('en-IN')}</span>
                                 </div>
                                 <div className="metric-box">
                                     <span className="metric-label">{isOwe ? "REMAINING" : "PENDING"}</span>
-                                    <span className="metric-val text-red">₹{(remaining / 100).toLocaleString('en-IN')}</span>
+                                    <span className="metric-val text-red">₹{(remaining).toLocaleString('en-IN')}</span>
                                 </div>
                             </div>
 
                             {d.total_emis && (
                                  <div className="debt-extra-info">
-                                 <span>EMI: ₹{(d.emi_amount / 100).toLocaleString("en-IN")} / {d.emi_frequency}</span>
+                                 <span>EMI: ₹{(d.emi_amount).toLocaleString("en-IN")} / {d.emi_frequency}</span>
                                  <span>Day {d.emi_day}</span>
                                  <span>{d.emis_paid} of {d.total_emis} EMIs</span>
                                  </div>

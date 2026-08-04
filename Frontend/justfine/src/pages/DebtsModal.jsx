@@ -26,12 +26,12 @@ function DebtsModal({ isOpen, onClose, onAdd, editingDebts }) {
         if(editingDebts){
             setFormData({person_name: editingDebts.person_name || "",
                         debt_type: editingDebts.debt_type || "i_owe",
-                        amount: editingDebts.amount ? editingDebts.amount / 100 : "",
-                        paid_amount: editingDebts.paid_amount ? editingDebts.paid_amount / 100 : "",
+                        amount: editingDebts.amount ? editingDebts.amount : "",
+                        paid_amount: editingDebts.paid_amount ? editingDebts.paid_amount : "",
                         description: editingDebts.description || "",
                         due_date: editingDebts.due_date || "",
                         emoji: editingDebts.emoji || "👤",
-                        emi_amount: editingDebts.emi_amount ? editingDebts.emi_amount / 100 : "",
+                        emi_amount: editingDebts.emi_amount ? editingDebts.emi_amount : "",
                         emi_frequency: editingDebts.emi_frequency || "",
                         emi_day: editingDebts.emi_day || "",
                         total_emis: editingDebts.total_emis || ""});
@@ -60,15 +60,15 @@ function DebtsModal({ isOpen, onClose, onAdd, editingDebts }) {
         const payload={
                         person_name: formData.person_name,
                         debt_type: formData.debt_type,
-                        amount: parseFloat(formData.amount || 0) * 100,
-                        paid_amount: parseFloat(formData.paid_amount || 0) * 100,
+                        amount: parseFloat(formData.amount || 0),
+                        paid_amount: parseFloat(formData.paid_amount || 0),
                         description: formData.description,
                         due_date: formData.due_date,
                         emoji: formData.emoji,
-                        emi_amount: formData.emi_amount ? parseFloat(formData.emi_amount) * 100 : null,
+                        emi_amount: formData.emi_amount ? parseFloat(formData.emi_amount): null,
                         emi_frequency: formData.emi_frequency || null,
-                        emi_day: formData.emi_day ? parseInt(formData.emi_day) : null,
-                        total_emis: formData.total_emis ? parseInt(formData.total_emis) : null,
+                        emi_day: formData.emi_day ? Number(formData.emi_day) : null,
+                        total_emis: formData.total_emis ? Number(formData.total_emis) : null
                     };
 
         try{
@@ -148,7 +148,7 @@ function DebtsModal({ isOpen, onClose, onAdd, editingDebts }) {
                             <option value="monthly">Monthly</option>
                             <option value="weekly">Weekly</option>
                         </select>
-                        <inpu className="form-input" type="number" name="emi_day" placeholder="EMI Day" value={formData.emi_day}
+                        <input className="form-input" type="number" name="emi_day" placeholder="EMI Day" value={formData.emi_day}
                             onChange={handleChange}/>
                         <input className="form-input" type="number" name="total_emis" placeholder="Total EMIs" value={formData.total_emis}
                             onChange={handleChange}/>

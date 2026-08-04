@@ -52,7 +52,8 @@ function Transaction(){
 
             const data = await response.json();
             if(response.ok){
-                fetchTransactions();
+                const data = await fetchTransactions();
+                setTransactions(data);
             }
             else{
                 showMessage(data.error || "Failed to delete transaction");

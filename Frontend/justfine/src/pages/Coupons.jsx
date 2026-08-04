@@ -1,27 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../static/Coupons.css";
 import CouponModal from "./CouponModal";
-
-const INITIAL_COUPONS = [
-    {
-        id: 1,
-        name: "Amazon Gift Card",
-        description: "Birthday gift",
-        amount: 2000,
-        remaining_amount: 500,
-        card_number: "AMZN-1234",
-        expiry_date: "2026-12-31",
-    },
-    {
-        id: 2,
-        name: "Swiggy Voucher",
-        description: "Office reward",
-        amount: 300,
-        remaining_amount: 300,
-        card_number: "SWGY-5678",
-        expiry_date: "2026-03-31",
-    },
-];
+import { fetchCoupons, deleteCoupons } from "../api/coupon";
 
 function formatExpiry(date) {
     return new Date(date).toLocaleDateString("en-US", {
@@ -32,9 +12,22 @@ function formatExpiry(date) {
 }
 
 function Coupons() {
-    const [coupons, setCoupons]=useState(INITIAL_COUPONS);
+    const [coupons, setCoupons]=useState([]);
     const [isModalOpen, setIsModalOpen]=useState(false);
     const [editingCoupon, setEditingCoupon]=useState(null);
+
+    const loadCoupons = async () => {
+        try{
+            const data = await fetchCoupons();
+            setCoupons(data);
+        } catch(err){
+            console.error(err);
+        }
+    };
+
+    useEffect(() => {
+        loadCoupons();
+    },[]);
 
     const openAddModal=() => {
         setEditingCoupon(null);
@@ -46,32 +39,13 @@ function Coupons() {
         setIsModalOpen(true);
     };
 
-    const handleSave=(formData) => {
-        const normalized = {
-            ...formData,
-            amount: Number(formData.amount),
-            remaining_amount: Number(formData.remaining_amount),
-        };
-
-        if (editingCoupon) {
-            setCoupons((prev) =>
-                prev.map((coupon) =>
-                    coupon.id === editingCoupon.id ? { ...coupon, ...normalized } : coupon
-                )
-            );
-        } else {
-            setCoupons((prev) => [
-                ...prev,
-                { ...normalized, id: Date.now() },
-            ]);
+    const handleDelete = async (couponId) => {
+        try{
+            await deleteCoupons(couponId);
+            loadCoupons();
+        } catch(err){
+            console.error(err);
         }
-
-        setIsModalOpen(false);
-        setEditingCoupon(null);
-    };
-
-    const handleDelete = (couponId) => {
-        setCoupons((prev) => prev.filter((coupon) => coupon.id !== couponId));
     };
 
     return (
@@ -88,7 +62,7 @@ function Coupons() {
             <div className="coupons-list">
                 {coupons.map((coupon) => {
                     const percent=coupon.amount
-                        ? Math.round((coupon.remaining_amount / coupon.amount) * 100)
+                        ? Math.round((coupon.remaining_amount / coupon.amount)* 100)
                         : 0;
 
                     return (
@@ -126,15 +100,13 @@ function Coupons() {
                 })}
             </div>
 
-            <CouponModal
-                isOpen={isModalOpen}
+            <CouponModal isOpen={isModalOpen}
+                editingCoupon={editingCoupon}
                 onClose={() => {
                     setIsModalOpen(false);
                     setEditingCoupon(null);
                 }}
-                onSave={handleSave}
-                initialData={editingCoupon}
-            />
+                onAdd={loadCoupons} />
         </div>
     );
 }

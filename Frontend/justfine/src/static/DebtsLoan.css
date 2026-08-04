@@ -45,6 +45,8 @@
     border-radius: 12px;
     padding: 20px;
     transition: 0.2s ease;
+    width: 850px;
+    margin: 0 auto;
 }
 
 .debt-card:hover{
@@ -78,10 +80,20 @@
     color: var(--text);
 }
 
-.debt-description{
+.debt-description {
     font-size: 12px;
     color: var(--text-muted);
-    margin-top: 4px;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.debt-due-date {
+    color: #ef4444;
+    font-weight: 500;
+    font-size: 12px;
 }
 
 .badge{

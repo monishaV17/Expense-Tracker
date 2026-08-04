@@ -31,6 +31,8 @@
 .coupons-list {
   display: grid;
   gap: 14px;
+  width: 100%;
+  max-width: 700px;
 }
 
 .coupon-card {
