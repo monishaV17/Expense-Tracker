@@ -3,7 +3,7 @@ import '../static/ModalTransac.css';
 
 const API_URL = "http://127.0.0.1:5000/api";
 
-const INITIAL_FORM_STATE={ name: "", description: "", amount: "", is_savings: false };
+const INITIAL_FORM_STATE={ name: "", description: "", amount: "", is_savings: false, is_active: true};
 
 function SourceModal({ isOpen, onClose, onAdd, editingSource}){
     const [formData, setFormData]=useState(INITIAL_FORM_STATE);
@@ -24,7 +24,8 @@ function SourceModal({ isOpen, onClose, onAdd, editingSource}){
                         description: editingSource.description || "",
                         amount: editingSource.amount ? editingSource.amount : "",
                         is_savings: editingSource.is_savings || false,
-                        created_at: editingSource.created_at ? editingSource.created_at.split("T")[0] : ""});
+                        created_at: editingSource.created_at ? editingSource.created_at.split("T")[0] : "",
+                        is_active: editingSource.is_active });
         }
         else{
             setFormData(INITIAL_FORM_STATE);
@@ -54,7 +55,8 @@ function SourceModal({ isOpen, onClose, onAdd, editingSource}){
             name: formData.name,
             description: formData.description,
             amount: parseFloat(formData.amount || 0),
-            is_savings: formData.is_savings
+            is_savings: formData.is_savings,
+            is_active: formData.is_active
         };
 
         try{
@@ -98,10 +100,15 @@ function SourceModal({ isOpen, onClose, onAdd, editingSource}){
                     <input className="form-input" name="description" type="text" placeholder="Description" value={formData.description} onChange={handleChange} required />
                     <input className="form-input" name="amount" type="number" placeholder="Amount (₹)" value={formData.amount} onChange={handleChange} />
                     
+                    <div className="checkbox-grp">
                     <label className="checkbox-label">
                         <input name="is_savings" type="checkbox" checked={formData.is_savings} onChange={handleChange} />
                         <span className="savings-acc">Savings Account</span>
                     </label>
+                    <label className="checkbox-label">
+                        <input type="checkbox" name="is_active" checked={formData.is_active} onChange={handleChange}/>
+                        <span className="active-src">Active Source</span>
+                    </label></div>
 
                     <button type="submit" disabled={loading}>
                     {loading ? (editingSource  ? "Updating..." : "Adding...")

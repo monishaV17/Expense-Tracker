@@ -19,7 +19,7 @@ function Transaction(){
         setMessage("");
     }, 2000);
     }
-    const filters = ["All", "Income", "Expense", "Transfer", "Debts"];
+    const filters = ["All", "Income", "Expense", "Transfer", "Debts", "Adjustments"];
     const filteredTransactions = active === "All" ? transactions : active === "Debts"
                                 ? transactions.filter((tx) => tx.txn_type === "debt_in" ||
                                 tx.txn_type === "debt_out") : transactions.filter(
@@ -30,17 +30,18 @@ function Transaction(){
         setIsModalOpen(true);
     };
 
-    useEffect(()=>{
-        const loadTransactions = async () =>{
-            try{
-                const data = await fetchTransactions();
-                setTransactions(data);
-            } catch(err){
-                showMessage(err.message);
-            }
-        };
+    const loadTransactions = async () => {
+        try {
+            const data = await fetchTransactions();
+            setTransactions(data);
+        } catch (err) {
+            showMessage(err.message);
+        }
+    };
+    
+    useEffect(() => {
         loadTransactions();
-    },[]);
+    }, []);
 
     const handleDelete = async (id)=>{
         try{
@@ -76,7 +77,7 @@ function Transaction(){
                                 <span className="txn-date">{new Date(tx.created_at).toLocaleDateString()}</span>
                                 <span className="txn-desc">{tx.description}</span>
                                 <span className={`txn-type-badge ${tx.txn_type}`}>{tx.txn_type}</span>
-                                <span className="txn-category">{tx.category_id} </span>
+                                <span className="txn-category">{tx.category_name} </span>
                                 <span className={`txn-amount ${tx.txn_type}`}>
                                     {tx.txn_type === "income" ? "+" : "−"}₹{tx.amount}
                                 </span>
@@ -93,7 +94,7 @@ function Transaction(){
                     isOpen={isModalOpen}
                     editingTransaction={editingTransaction}
                     onClose={() => setIsModalOpen(false)}
-                    onAdd={fetchTransactions} />
+                    onAdd={loadTransactions} />
         </div>
     );
 }

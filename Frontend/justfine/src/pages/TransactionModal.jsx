@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import '../static/ModalTransac.css';
+import { fetchCategories } from "../api/categories";
+import { fetchSources } from "../api/sources";
 
 const API_URL = "http://127.0.0.1:5000/api";
 
@@ -13,26 +15,6 @@ function TransactionModal({ isOpen, onClose, onAdd, initialType, editingTransact
         { id: "adjustment", name: "Adjustments" }
     ];
 
-    const categories=[
-        { id: "food", name: "Food & Dining" },
-        { id: "transport", name: "Transport" },
-        { id: "shopping", name: "Shopping" },
-        { id: "bills", name: "Bills & Utilities" },
-        { id: "entertainment", name: "Entertainment" },
-        { id: "healthcare", name: "Healthcare" },
-        { id: "salary", name: "Salary" },
-        { id: "side_gig", name: "Side Gig" },
-        { id: "tithe", name: "Tithe" },
-        { id: "others", name: "Others" }
-    ];
-
-    const sources=[
-        { id: "cash", name: "Cash" },
-        { id: "bank", name: "Bank" },
-        { id: "card", name: "Credit Card" },
-        { id: "savings", name: "Savings" }
-    ];
-
     const [formData, setFormData]=useState({
         amount: "",
         txn_type: "expense",
@@ -42,9 +24,11 @@ function TransactionModal({ isOpen, onClose, onAdd, initialType, editingTransact
         created_at: ""
     });
     
-    const[loading, setLoading]=useState(false);
-    const[error, setError]=useState(null);
-    const[message,setMessage]=useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [message,setMessage] = useState("");
+    const [sources, setSources] = useState([]);
+    const [categories, setCategories] = useState([]);
 
     const showMessage=(text) => {
         setMessage(text);
@@ -52,6 +36,33 @@ function TransactionModal({ isOpen, onClose, onAdd, initialType, editingTransact
         setMessage("");
         }, 2000);
     }
+
+    useEffect(() => {
+        const loadSources = async () => {
+            try {
+                const data = await fetchSources();
+                setSources(data);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+    
+        loadSources();
+    }, []);
+
+    const loadCategories = async () => {
+        try {
+            const data = await fetchCategories();
+            setCategories(data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    useEffect(() => {
+        loadCategories();
+    }, []);
+
 
    useEffect(()=>{
     if(isOpen){
@@ -173,7 +184,9 @@ function TransactionModal({ isOpen, onClose, onAdd, initialType, editingTransact
                     <select value={formData.category_id} onChange={e => setFormData({ ...formData, category_id: e.target.value })} 
                         required >
                         <option value="">Select Category</option>
-                        {categories.map((category) => (
+                        {categories.filter(category => category.name !== "Tithe")
+                        .sort((a, b) => (a.name === "Others" ? 1 : b.name === "Others" ? -1 : 0))
+                        .map((category) => (
                             <option key={category.id} value={category.id}>{category.name}</option>
                         ))}
                     </select>

@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from "react";
 import '../static/ModalTransac.css';
 import {fetchSources} from '../api/sources';
+import { fetchCategories } from "../api/categories";
 
 const API_URL = "http://127.0.0.1:5000/api";
 
@@ -24,6 +25,8 @@ function BudgetModal({isOpen, onClose, onAdd, editingBudget}){
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [sources, setSources] = useState([]);
+    const [categories, setCategories] = useState([]);
+
 
     useEffect(() => {
         if (editingBudget) {
@@ -62,6 +65,19 @@ function BudgetModal({isOpen, onClose, onAdd, editingBudget}){
         };
     
         loadSources();
+    }, []);
+
+    const loadCategories = async () => {
+        try {
+            const data = await fetchCategories();
+            setCategories(data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    useEffect(() => {
+        loadCategories();
     }, []);
 
     if(!isOpen){
@@ -123,7 +139,9 @@ function BudgetModal({isOpen, onClose, onAdd, editingBudget}){
                     <select value={formData.category_id}
                     onChange={e=> setFormData({...formData,category_id: e.target.value})} required >
                     <option value="">Select Category</option>
-                    {categories.map((category) => (
+                    {categories.filter(category => category.name !== "Tithe")
+                    .sort((a, b) => (a.name === "Others" ? 1 : b.name === "Others" ? -1 : 0))
+                    .map((category) => (
                         <option key={category.id} value={category.id}>{category.name}</option>
                     ))}
                     </select>
