@@ -1,15 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
-import { useOutletContext } from "react-router-dom";
 import '../static/sources.css';
 import FilterBox from '../components/FilterBox';
 import SourceModal from './SourceModal.jsx';
 import PartitionsModal from "./PartitionsModal.jsx";
-import {deleteSource,  deletePartition} from "../api/sources.js";
+import {fetchSources, deleteSource,  deletePartition} from "../api/sources.js";
 
 function Sources() {
     const [isSourceModalOpen, setIsSourceModalOpen] = useState(false);
     const [filter, setFilter] = useState("All");
-    const { sources, refreshSources } = useOutletContext();
+    const [sources, setSources] = useState([]);
     const [isPartitionModalOpen, setIsPartitionModalOpen] = useState(false);
     const [selectedSource, setSelectedSource] = useState(null);
     const [editingSource, setEditingSource] = useState(null);
@@ -29,10 +28,25 @@ function Sources() {
         setIsSourceModalOpen(true);
     };
 
+    const loadSources = useCallback(async () => {
+        try {
+          const data = await fetchSources();
+          setSources(data);
+        } catch (err) {
+          console.error(err);
+        } finally{
+            setLoading(false);
+        }
+      }, []);
+
+    useEffect(() => {
+        loadSources();
+    },[loadSources]);
+
     const handleDeleteSource = async (sourceId) => {
         try{
             await deleteSource(sourceId);
-            refreshSources();
+            loadSources();
         } catch(err){
             console.error(err);
         }
@@ -53,7 +67,7 @@ function Sources() {
     const handleDeletePartition = async (partitionId) =>{
         try{
             await deletePartition(partitionId);
-            refreshSources();
+            laodSources();
         } catch(err){
             console.error(err);
         }
@@ -68,9 +82,13 @@ function Sources() {
 
             <FilterBox filters={["All", "Active", "Savings", "Inactive"]} active={filter} onChange={setFilter} />
             
-            {filteredSources.length === 0 ? (
+            {loading ? (
+                <div className="loading-spinner-container">
+                <div className="loading-spinner"></div>
+                </div>
+                ) : filteredSources.length === 0 ? (
                 <p className="empty-state">No sources found</p>
-            ) : (
+                ) : (
                 filteredSources.map(s => (
                     <div key={s.id} className="src-card">
                         <div className="src-top">
@@ -100,7 +118,7 @@ function Sources() {
                                         <div className="part-right">
                                             <span className="part-amt">₹{p.amount}</span>
                                             <button className="part-edit-btn" onClick={() => openEditPartition(s, p)}>Edit</button>
-                                            <button className="action-btn delete" onClick={() => handleDeletePartition(p.id)}>Delete</button>
+                                            <button className="part-btn-delete" onClick={() => handleDeletePartition(p.id)}>Delete</button>
                                         </div>
                                     </div>
                         ))}
@@ -108,9 +126,9 @@ function Sources() {
                     )}
 
                         <div className="src-actions">
-                            <button className="action-btn" onClick={() => openEditModal(s)}>Edit</button>
-                            <button className="action-btn" onClick={()=> openAddPartition(s)}>Partitions</button>
-                            <button className="action-btn delete" onClick={()=> handleDeleteSource(s.id)}>Delete</button>
+                            <button className="action-btn-add" onClick={()=> openAddPartition(s)}>Add Partitions</button>
+                            <button className="action-btn-edit" onClick={() => openEditModal(s)}>Edit</button>
+                            <button className="action-btn-delete" onClick={()=> handleDeleteSource(s.id)}>Delete</button>
                         </div>
                     </div>
                 ))
@@ -122,14 +140,14 @@ function Sources() {
                 setIsSourceModalOpen(false);
                 setEditingSource(null);
             }}
-            onAdd={refreshSources} />
+            onAdd={loadSources} />
 
             <PartitionsModal isOpen={isPartitionModalOpen} onClose={() => {
                 setIsPartitionModalOpen(false); 
                 setEditingPartition(null);
                 setSelectedSource(null);
                 }} 
-                onAdd={refreshSources}
+                onAdd={loadSources}
                 editingPartition={editingPartition} 
                 sourceId={selectedSource?.id}
             />

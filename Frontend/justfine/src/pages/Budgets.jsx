@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useState, useCallback} from "react";
 import '../static/budget.css';
 import BudgetModal from "./BudgetModal";
 import { fetchBudgets, deleteBudgets } from "../api/budget";
@@ -18,6 +18,7 @@ function Budgets(){
     const [editingBudget, setEditingBudget] = useState(null);
     const [error, setError] = useState(null);
     const [sources, setSources] = useState([]);
+    const [loading, setLoading] = useState(true);
 
 useEffect(() => {
     const loadSources = async () => {
@@ -28,23 +29,24 @@ useEffect(() => {
             console.error(err);
         }
     };
-
     loadSources();
 }, []);
 
 
-    const loadBudgets = async () => {
+    const loadBudgets = useCallback(async () => {
         try{
             const data = await fetchBudgets();
             setBudgets(data);
         } catch(err){
             console.error(err);
+        } finally{
+            setLoading(false);
         }
-    };
+    },[]);
 
     useEffect(() => {
         loadBudgets();
-    },[]);
+    },[loadBudgets]);
 
     const openAddModal = () => {
         setEditingBudget(null);
@@ -72,21 +74,27 @@ useEffect(() => {
                 <h2>Plan money ahead of time</h2>
                 <button className="budget-add-btn" onClick={openAddModal}>+ Add Budget</button>
             </div>
-            <ul>
-                {budgets.map((bd) => (
-                    <li key={bd.id} className="budget-item">
-                        <span className="bd-date">{new Date(bd.budget_date).toLocaleDateString("en-IN")}</span>
-                        <span className="bd-desc">{bd.description}</span><br />
-                        <span className="bd-source">{sources.find(s => s.id === bd.source_id)?.name}</span>
-                        <span className="bd-category">{categories.find(c => c.id === bd.category_id)?.name}</span>
-                        <span className="bd-amount">₹{bd.amount}</span>
-                        <div className="bd-actions-group"><br/>
+                {loading ? (
+                    <div className="loading-spinner-container">
+                    <div className="loading-spinner"></div>
+                    </div>
+                    ) 
+                    : ( 
+                        <ul>
+                            {budgets.map((bd) => (
+                            <li key={bd.id} className="budget-item">
+                                <span className="bd-date">{new Date(bd.budget_date).toLocaleDateString("en-IN")}</span>
+                                <span className="bd-desc">{bd.description}</span>
+                                <span className="bd-source">{sources.find(s => s.id === bd.source_id)?.name}</span>
+                                <span className="bd-category">{categories.find(c => c.id === bd.category_id)?.name}</span>
+                                <span className="bd-amount">₹{bd.amount}</span>
+                            <div className="bd-actions-group">
                             <button className="bd-action-btn" onClick={() => openEditModal(bd)}>Edit</button>
                             <button className="bd-action-btn delete" onClick={() => handleDelete(bd.id)}>Delete</button>
                         </div>
                     </li>
                 ))}
-            </ul>
+            </ul>)}
 
             <BudgetModal
                 isOpen={isModalOpen}

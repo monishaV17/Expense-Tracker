@@ -89,8 +89,8 @@ function Transaction() {
                                 {tx.txn_type === "income" ? "+" : "−"}₹{tx.amount}
                             </span>
                             <div className="bd-actions-group"><br/>
-                                <button className="bd-action-btn" onClick={() => openEditModal(tx)}>Edit</button>
-                                <button className="bd-action-btn delete" onClick={() => handleDelete(tx.id)}>Delete</button>
+                                <button className="tr-action-btn" onClick={() => openEditModal(tx)}>Edit</button>
+                                <button className="tr-action-btn-delete" onClick={() => handleDelete(tx.id)}>Delete</button>
                             </div>
                         </li>
                     ))}

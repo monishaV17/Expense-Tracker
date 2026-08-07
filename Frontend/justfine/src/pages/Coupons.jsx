@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
+import React, { useState, useEffect , useCallback} from "react";
 import "../static/Coupons.css";
 import CouponModal from "./CouponModal";
-import { deleteCoupons } from "../api/coupon";
+import { fetchCoupons, deleteCoupons } from "../api/coupon";
 
 function formatExpiry(date) {
     return new Date(date).toLocaleDateString("en-US", {
@@ -13,9 +12,10 @@ function formatExpiry(date) {
 }
 
 function Coupons() {
-    const { coupons, refreshCoupons } = useOutletContext();
+    const [coupons, setCoupons]=useState([]);
     const [isModalOpen, setIsModalOpen]=useState(false);
     const [editingCoupon, setEditingCoupon]=useState(null);
+    const [loading, setLoading] = useState(true);
 
     const openAddModal=() => {
         setEditingCoupon(null);
@@ -27,10 +27,26 @@ function Coupons() {
         setIsModalOpen(true);
     };
 
+    const loadCoupons = useCallback(async () => {
+        try{
+            const data = await fetchCoupons();
+            setCoupons(data);
+        } catch(err){
+            console.error(err);
+        } finally{
+            setLoading(false);
+        }
+      },[]);
+
+    useEffect(() => {
+        loadCoupons();
+    },[loadCoupons]);
+
+
     const handleDelete = async (couponId) => {
         try{
             await deleteCoupons(couponId);
-            refreshCoupons();
+            loadCoupons();
         } catch(err){
             console.error(err);
         }
@@ -48,7 +64,11 @@ function Coupons() {
             </div>
 
             <div className="coupons-list">
-                {coupons.map((coupon) => {
+                {loading ? (
+                    <div className="loading-spinner-container">
+                    <div className="loading-spinner"></div>
+                    </div>
+                    )  : coupons.map((coupon) => {
                     const percent=coupon.amount
                         ? Math.round((coupon.remaining_amount / coupon.amount)* 100)
                         : 0;
@@ -94,7 +114,7 @@ function Coupons() {
                     setIsModalOpen(false);
                     setEditingCoupon(null);
                 }}
-                onAdd={refreshCoupons} />
+                onAdd={loadCoupons} />
         </div>
     );
 }

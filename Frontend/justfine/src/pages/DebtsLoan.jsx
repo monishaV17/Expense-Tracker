@@ -1,24 +1,40 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect, useCallback} from "react";
 import { useOutletContext } from "react-router-dom";
 import DebtsModal from "./DebtsModal"; 
 import "../static/DebtsLoan.css";
-import { deleteDebts } from "../api/debts";
+import { fetchDebts, deleteDebts } from "../api/debts";
 
 function DebtsLoan() {
     
-    const { debts, refreshDebts } = useOutletContext();
+    const [debts, setDebts] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingDebts, setEditingDebts] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     const openEditModal = (debt)=>{
         setEditingDebts(debt);
         setIsModalOpen(true);
     };
 
+    const loadDebts = useCallback(async ()=> {
+        try{
+            const data = await fetchDebts();
+            setDebts(data);
+        } catch(err){
+            console.error(err);
+        } finally{
+            setLoading(false);
+        }
+     },[]);
+
+     useEffect(() => {
+        loadDebts();
+     },[loadDebts]);
+
     const handleDelete = async (DebtId)=> {
         try{
             await deleteDebts(DebtId);
-            refreshDebts();
+            loadDebts();
         } catch(err){
             console.error(err);
         }
@@ -39,7 +55,11 @@ function DebtsLoan() {
             </div>
 
             <div className="debts-list">
-                {debts.map((d) => {
+                {loading ? (
+                    <div className="loading-spinner-container">
+                    <div className="loading-spinner"></div>
+                    </div>
+                    )  : debts.map((d) => {
                     const isOwe = d.debt_type === "i_owe";
                     const remaining = d.amount - d.paid_amount;
                     
@@ -101,8 +121,8 @@ function DebtsLoan() {
                                     {d.extraInfo && <span>{d.extraInfo}</span>}
                                 </div>
                                 <div className="debt-actions-group">
-                                    <button className="action-btn" onClick={() => openEditModal(d)}>Edit</button>
-                                    <button className="action-btn delete" onClick={() => handleDelete(d.id)}>Delete</button>
+                                    <button className="action-btn-edit" onClick={() => openEditModal(d)}>Edit</button>
+                                    <button className="action-btn-delete" onClick={() => handleDelete(d.id)}>Delete</button>
                                 </div>
                             </div>
                         </div>
@@ -116,7 +136,7 @@ function DebtsLoan() {
                 setIsModalOpen(false);
                 setEditingDebts(null);
                 }}
-                onAdd={refreshDebts}/>
+                onAdd={loadDebts}/>
         </div>
     );
 }

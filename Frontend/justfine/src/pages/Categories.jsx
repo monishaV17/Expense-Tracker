@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "../static/categories.css";
 import CategoryModal from "./CategoryModal";
 import { fetchCategories, deleteCategories } from "../api/categories";
@@ -7,19 +7,22 @@ function Categories() {
     const [categories, setCategories] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingCategory, setEditingCategory] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    const loadCategories = async () => {
+    const loadCategories = useCallback(async () => {
         try {
             const data = await fetchCategories();
             setCategories(data);
         } catch (err) {
             console.error(err);
+        } finally{
+            setLoading(false);
         }
-    };
+    },[]);
 
     useEffect(() => {
         loadCategories();
-    }, []);
+    }, [loadCategories]);
 
     const openAddModal = () => {
         setEditingCategory(null);
@@ -48,7 +51,11 @@ function Categories() {
             </div>
 
             <div className="categories-grid">
-                {categories
+                {loading ? (
+                    <div className="loading-spinner-container">
+                    <div className="loading-spinner"></div>
+                    </div>
+                    )  : categories
                     .filter((cat) => cat.name !== "Tithe")
                     .sort((a, b) => (a.name === "Others" ? 1 : b.name === "Others" ? -1 : 0))
                     .map((cat) => (
