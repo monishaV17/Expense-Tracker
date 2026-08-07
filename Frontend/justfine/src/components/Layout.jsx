@@ -1,40 +1,70 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import '../static/Layout.css';
 import TopBar from './TopBar';
 import SideBar from './SideBar';
 import { Outlet, useLocation } from "react-router-dom";
+import { fetchSources } from "../api/sources";
+import { fetchDebts } from "../api/debts";
+import { fetchCoupons } from "../api/coupon";
 
-const pageTitles = {"/dashboard": "Dashboard","/transaction": "Transactions",
-                      "/sources": "Sources","/debts": "Debts & Loans",
-                      "/coupons": "Coupons","/budgets": "Budgets",
-                      "/categories": "Categories","/notifications": "Notifications",
-                     };
-
-const initialTransactions = [
-  { id: 1, amount: 180, txn_type: "expense", category_id: "Food & Dining", source_id: "HDFC", description: "Lunch", date: "2026-07-05" },
-  { id: 2, amount: 500, txn_type: "expense", category_id: "Transport", source_id: "Petty Cash", description: "Uber ride", date: "2026-07-04" },
-  { id: 3, amount: 50000, txn_type: "income", category_id: "Salary", source_id: "HDFC", description: "Monthly salary", date: "2026-07-01" },
-  { id: 4, amount: 2200, txn_type: "expense", category_id: "Bills & Utilities", source_id: "SBI", description: "Electricity bill", date: "2026-06-28" },
-  { id: 5, amount: 1200, txn_type: "expense", category_id: "Shopping", source_id: "SBI", description: "Groceries", date: "2026-06-25" }
-];
+const pageTitles = {
+  "/dashboard": "Dashboard","/transaction": "Transactions",
+  "/sources": "Sources","/debts": "Debts & Loans",
+  "/coupons": "Coupons","/budgets": "Budgets",
+  "/categories": "Categories","/notifications": "Notifications",
+};
 
 function Layout(){
-  const [headerLabel,setHeaderLabel]=useState("Dashboard");
-  const [transactions, setTransactions] = useState(initialTransactions);
+  const [headerLabel, setHeaderLabel] = useState("Dashboard");
+  const [sources, setSources] = useState([]);
+  const [debts, setDebts] = useState([]);
+  const [coupons, setCoupons]=useState([]);
   const location = useLocation();
   const currentLabel = pageTitles[location.pathname] || "Dashboard";
 
-  const handleAddTransaction = (newTransaction) => {
-    setTransactions((prev) => [...prev, newTransaction]);
-  };
+  const loadSources = useCallback(async () => {
+    try {
+      const data = await fetchSources();
+      setSources(data);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  const loadDebts = useCallback(async ()=> {
+    try{
+        const data = await fetchDebts();
+        setDebts(data);
+    } catch(err){
+        console.error(err);
+    }
+ },[]);
+
+ const loadCoupons = useCallback(async () => {
+  try{
+      const data = await fetchCoupons();
+      setCoupons(data);
+  } catch(err){
+      console.error(err);
+  }
+},[]);
+
+  useEffect(() => {
+    loadSources();
+    loadDebts();
+    loadCoupons();
+  }, [loadSources, loadDebts, loadCoupons]);
 
   return (
     <div className="layout">
       <SideBar />
       <div className="layout-right">
-        <TopBar headerLabel={currentLabel} onAddTransaction={handleAddTransaction} />
+        <TopBar headerLabel={currentLabel} />
         <main className="layout-content">
-          <Outlet context={{ transactions, onAddTransaction: handleAddTransaction }} />
+          <Outlet context={{
+                             sources, refreshSources: loadSources,
+                             debts,   refreshDebts: loadDebts,
+                             coupons, refreshCoupons: loadCoupons  }} />
         </main>
       </div>
     </div>

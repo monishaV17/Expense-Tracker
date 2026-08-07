@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import "../static/Coupons.css";
 import CouponModal from "./CouponModal";
-import { fetchCoupons, deleteCoupons } from "../api/coupon";
+import { deleteCoupons } from "../api/coupon";
 
 function formatExpiry(date) {
     return new Date(date).toLocaleDateString("en-US", {
@@ -12,22 +13,9 @@ function formatExpiry(date) {
 }
 
 function Coupons() {
-    const [coupons, setCoupons]=useState([]);
+    const { coupons, refreshCoupons } = useOutletContext();
     const [isModalOpen, setIsModalOpen]=useState(false);
     const [editingCoupon, setEditingCoupon]=useState(null);
-
-    const loadCoupons = async () => {
-        try{
-            const data = await fetchCoupons();
-            setCoupons(data);
-        } catch(err){
-            console.error(err);
-        }
-    };
-
-    useEffect(() => {
-        loadCoupons();
-    },[]);
 
     const openAddModal=() => {
         setEditingCoupon(null);
@@ -42,7 +30,7 @@ function Coupons() {
     const handleDelete = async (couponId) => {
         try{
             await deleteCoupons(couponId);
-            loadCoupons();
+            refreshCoupons();
         } catch(err){
             console.error(err);
         }
@@ -106,7 +94,7 @@ function Coupons() {
                     setIsModalOpen(false);
                     setEditingCoupon(null);
                 }}
-                onAdd={loadCoupons} />
+                onAdd={refreshCoupons} />
         </div>
     );
 }

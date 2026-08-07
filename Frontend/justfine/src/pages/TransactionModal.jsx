@@ -37,16 +37,16 @@ function TransactionModal({ isOpen, onClose, onAdd, initialType, editingTransact
         }, 2000);
     }
 
+    const loadSources = async () => {
+        try {
+            const data = await fetchSources();
+            setSources(data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     useEffect(() => {
-        const loadSources = async () => {
-            try {
-                const data = await fetchSources();
-                setSources(data);
-            } catch (err) {
-                console.error(err);
-            }
-        };
-    
         loadSources();
     }, []);
 
@@ -65,7 +65,6 @@ function TransactionModal({ isOpen, onClose, onAdd, initialType, editingTransact
 
 
    useEffect(()=>{
-    if(isOpen){
         if(editingTransaction){
             setFormData({
                 amount: editingTransaction.amount || "",
@@ -88,37 +87,19 @@ function TransactionModal({ isOpen, onClose, onAdd, initialType, editingTransact
             });
         }
         setError(null);
-    }
-   },[isOpen,editingTransaction,initialType]);
-
-    const handleClose=(e) => {
-        if(e){
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        setFormData({ amount: "", 
-            txn_type: "expense", 
-            category_id: "", 
-            source_id: "", 
-            description: "", 
-            created_at: "" });
-            
-        setError(null);
-        if(typeof onClose === "function"){
-            onClose();
-        }
-    };
+    },
+    [isOpen,editingTransaction,initialType]);
 
     if(!isOpen){
         return null;
     }
 
-    const handleSubmit=async (e) =>{
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
-
-        const payload={
+    
+        const payload = {
             amount: parseFloat(formData.amount),
             txn_type: formData.txn_type,
             category_id: formData.category_id,
@@ -126,13 +107,14 @@ function TransactionModal({ isOpen, onClose, onAdd, initialType, editingTransact
             description: formData.description,
             created_at: formData.created_at
         };
-
-        try{
+    
+        try {
             const token = localStorage.getItem("token");
-            const url = editingTransaction ? `${API_URL}/transactions/${editingTransaction.id}`
-                                         : `${API_URL}/transactions`;
+            const url = editingTransaction 
+                ? `${API_URL}/transactions/${editingTransaction.id}`
+                : `${API_URL}/transactions`;
             const method = editingTransaction ? "PUT" : "POST";
-
+    
             const response = await fetch(url, {
                 method: method,
                 headers: {
@@ -141,31 +123,28 @@ function TransactionModal({ isOpen, onClose, onAdd, initialType, editingTransact
                 },
                 body: JSON.stringify(payload)
             });
-
-            const data=await response.json();
-            if(response.ok) {
-                if(typeof onAdd === "function"){
-                    onAdd();
+    
+            const data = await response.json();
+            if (response.ok) {
+                if (typeof onAdd === "function") {
+                    await onAdd(); 
                 }
-                showMessage(data.message || (editingTransaction ? "Transaction updated successfully" 
-                            : "Transaction addedd successfully"));
-                setTimeout(() => {
-                    handleClose();
-                }, 1200);
-            } else{
-                setError(data.message || "Failed to add transaction");
+                window.dispatchEvent(new Event("transactions-updated"));
+                onClose(); 
+            } else {
+                setError(data.message || (editingTransaction ? "Failed to update transaction" : "Failed to add transaction"));
             }
-        } catch(err){
+        } catch (err) {
             setError(`Error occurred: ${err.message}`);
-        } finally{
+        } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="modal-overlay" onClick={handleClose}>
+        <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                <button type="button" className="close-btn" onClick={handleClose}>✕</button>
+                <button type="button" className="close-btn" onClick={onClose}>✕</button>
 
                 {error && <div className="error-message" style={{ color: "red", marginBottom: "10px" }}>{error}</div>}
                 {message && <div className="message">{message}</div>}

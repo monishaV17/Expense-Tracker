@@ -1,25 +1,14 @@
 import React, { useState, useEffect} from "react";
+import { useOutletContext } from "react-router-dom";
 import DebtsModal from "./DebtsModal"; 
 import "../static/DebtsLoan.css";
-import { fetchDebts, deleteDebts } from "../api/debts";
+import { deleteDebts } from "../api/debts";
 
 function DebtsLoan() {
-    const [debts, setDebts] = useState([]);
+    
+    const { debts, refreshDebts } = useOutletContext();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingDebts, setEditingDebts] = useState(null);
-
-    const loadDebts = async ()=> {
-        try{
-            const data = await fetchDebts();
-            setDebts(data);
-        } catch(err){
-            console.error(err);
-        }
-    };
-
-    useEffect(()=>{
-        loadDebts();
-    },[]);
 
     const openEditModal = (debt)=>{
         setEditingDebts(debt);
@@ -29,7 +18,7 @@ function DebtsLoan() {
     const handleDelete = async (DebtId)=> {
         try{
             await deleteDebts(DebtId);
-            loadDebts();
+            refreshDebts();
         } catch(err){
             console.error(err);
         }
@@ -51,7 +40,6 @@ function DebtsLoan() {
 
             <div className="debts-list">
                 {debts.map((d) => {
-                    console.log(d);
                     const isOwe = d.debt_type === "i_owe";
                     const remaining = d.amount - d.paid_amount;
                     
@@ -128,7 +116,7 @@ function DebtsLoan() {
                 setIsModalOpen(false);
                 setEditingDebts(null);
                 }}
-                onAdd={loadDebts}/>
+                onAdd={refreshDebts}/>
         </div>
     );
 }

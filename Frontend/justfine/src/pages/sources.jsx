@@ -1,18 +1,20 @@
 import { useState, useEffect, useCallback } from "react";
+import { useOutletContext } from "react-router-dom";
 import '../static/sources.css';
 import FilterBox from '../components/FilterBox';
 import SourceModal from './SourceModal.jsx';
 import PartitionsModal from "./PartitionsModal.jsx";
-import {fetchSources, deleteSource,  deletePartition} from "../api/sources.js";
+import {deleteSource,  deletePartition} from "../api/sources.js";
 
 function Sources() {
     const [isSourceModalOpen, setIsSourceModalOpen] = useState(false);
     const [filter, setFilter] = useState("All");
-    const [sources, setSources] = useState([]);
+    const { sources, refreshSources } = useOutletContext();
     const [isPartitionModalOpen, setIsPartitionModalOpen] = useState(false);
     const [selectedSource, setSelectedSource] = useState(null);
     const [editingSource, setEditingSource] = useState(null);
     const [editingPartition, setEditingPartition] = useState(null);
+    const [loading, setLoading] = useState(true);
 
 
     const filteredSources = sources.filter(s => {
@@ -22,19 +24,6 @@ function Sources() {
         return true;
     });
 
-    const loadSources = useCallback(async () => {
-        try {
-            const data = await fetchSources();
-            setSources(data);
-        } catch (err) {
-            console.error(err);
-        }
-    }, []);
-
-    useEffect(() => {
-        loadSources();
-    }, [loadSources]);
-
     const openEditModal= (source) => {
         setEditingSource(source);
         setIsSourceModalOpen(true);
@@ -43,7 +32,7 @@ function Sources() {
     const handleDeleteSource = async (sourceId) => {
         try{
             await deleteSource(sourceId);
-            loadSources();
+            refreshSources();
         } catch(err){
             console.error(err);
         }
@@ -64,7 +53,7 @@ function Sources() {
     const handleDeletePartition = async (partitionId) =>{
         try{
             await deletePartition(partitionId);
-            loadSources();
+            refreshSources();
         } catch(err){
             console.error(err);
         }
@@ -133,14 +122,14 @@ function Sources() {
                 setIsSourceModalOpen(false);
                 setEditingSource(null);
             }}
-            onAdd={loadSources} />
+            onAdd={refreshSources} />
 
             <PartitionsModal isOpen={isPartitionModalOpen} onClose={() => {
                 setIsPartitionModalOpen(false); 
                 setEditingPartition(null);
                 setSelectedSource(null);
                 }} 
-                onAdd={loadSources}
+                onAdd={refreshSources}
                 editingPartition={editingPartition} 
                 sourceId={selectedSource?.id}
             />

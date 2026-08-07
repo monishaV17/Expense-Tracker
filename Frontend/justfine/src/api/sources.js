@@ -1,9 +1,9 @@
-const API_URL = "http://localhost:5000/api/sources";
+const API_URL = "http://localhost:5000/api";
 
 const fetchSources = async () => {
     try{
     const token = localStorage.getItem("token");
-    const response = await fetch(API_URL, {
+    const response = await fetch(`${API_URL}/sources`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -25,7 +25,7 @@ catch(err){
     const deleteSource = async (sourceId) => {
         try{
             const token = localStorage.getItem("token");
-            const response = await fetch(`${API_URL}/${sourceId}`,{
+            const response = await fetch(`${API_URL}/sources/${sourceId}`,{
                 method: "DELETE",
                 
                 headers: {
